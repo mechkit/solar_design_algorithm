@@ -1,0 +1,39 @@
+{
+  "rules": {
+    "indent": [
+      1,
+      2
+    ],
+    "quotes": [
+      1,
+      "single"
+    ],
+    "linebreak-style": [
+      2,
+      "unix"
+    ],
+    "semi": [
+      2,
+      "always"
+    ],
+    "no-console": 0,
+    "no-unused-vars": 1,
+  },
+  "env": {
+    "node": true,
+    "browser": true,
+    "es6": true
+  },
+  "parserOptions": {
+    "sourceType": "module",
+  },
+  "extends": "eslint:recommended",
+  "globals": {
+    "$": true,
+    "_": true,
+    "module": true,
+    "global": true,
+    "logger": true,
+    "f": true
+  }
+}
