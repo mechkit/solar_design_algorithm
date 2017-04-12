@@ -1,0 +1,12 @@
+body {
+    font-size: 0.3em;
+}
+
+a {
+  text-decoration: none;
+}
+
+table {
+  border: 1px black solid;
+  border-collapse: collapse;
+}
