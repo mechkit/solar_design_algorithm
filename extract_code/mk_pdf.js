@@ -13,10 +13,16 @@ var base_path = path.resolve(__dirname, '../');
 
 var markdownpdf = require('markdown-pdf');
 
+var preProcessHtml = function(input){
+  console.log(input);
+};
+
 var options = {
   paperFormat: 'letter',
   paperBorder: '0.5in',
-  cssPath: 'style.css',
+  //cssPath: 'style.css',
+  cssPath: base_path + '/extract_code/style.css',
+  //preProcessHtml: preProcessHtml,
   remarkable: {
     html: true,
     breaks: true,
