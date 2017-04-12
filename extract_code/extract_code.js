@@ -15,13 +15,16 @@ var renderer = function(input_string){
     lines.forEach(function(line, i){
       var matches = code_check.exec(line);
       if( matches !== null) {
-        //console.log(i, matches);
-        output_code_array.push(line);
+        var whitespace_size = matches[0].length-1;
+        var unindented_code_line = line.slice(whitespace_size);
+
+        var code_line = '  ' + unindented_code_line;
+
+        output_code_array.push(code_line);
       }
     });
 
-
-    var output_string = output_code_array.join('/n');
+    var output_string = output_code_array.join('\n');
 
   } else {
     output_string = input_string;
@@ -32,17 +35,17 @@ var renderer = function(input_string){
 
 
 var render_files = function(input_md_filename, output_code_filename){
-  var in_dir = in_dir || '';
-  var out_dir = out_dir || '';
-  var input_path = path.resolve(__dirname, in_dir);
-  var output_path = path.resolve(__dirname, out_dir);
+  var base_path = path.resolve(__dirname, '../');
 
-  var input_file_path = path.resolve(input_path, input_md_filename);
+  var input_file_path = path.resolve(base_path, input_md_filename);
   var input_string = fs.readFileSync(input_file_path, {encoding: 'utf8'});
 
   var output_string = renderer(input_string);
 
-  var output_file_path = path.resolve(output_path, output_code_filename);
+  var output_file_path = path.resolve(base_path, output_code_filename);
+  var input_string_pre = fs.readFileSync( base_path + '/extract_code/' + output_code_filename+'.pre', {encoding: 'utf8'}) || '';
+  var input_string_post = fs.readFileSync( base_path + '/extract_code/' + output_code_filename+'.post', {encoding: 'utf8'}) || '';
+  output_string = input_string_pre + output_string + input_string_post;
   fs.writeFileSync(output_file_path, output_string, {encoding: 'utf8'});
 };
 
