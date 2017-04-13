@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/kshowalter/solar_design_algorithm#readme",
   "dependencies": {
-    "markdown-pdf": "^7.0.0"
+    "process_code_defining_document": "kshowalter/process_code_defining_document"
   }
 }
