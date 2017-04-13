@@ -1,11 +1,13 @@
 # Solar Design Algorithm
 
 The document below defines the calculations used to design and evaluate a PV system in preparation for creating electrical drawings.
-Most of the computer code is detailed below, and the full system calculation code is found [here](https://github.com/kshowalter/SPD_server/blob/master/lib/calculate_system.js). This algorithm is currently implemented in Javascript.
+Most of the computer code is detailed below, and the full system calculation code is found [here](https://github.com/kshowalter/SPD_server/blob/master/lib/calculate_system.js). This algorithm is currently implemented in Javascript. The "Javascript" labeled boxes below is the actual code used in FSEC's application code.
 
-Note: For each section the symbols are perpended by a section name when stored as a variable in the computer code, in the form of "section.symbol".
+Note: For each section the symbols are prepended by a section name when stored as a variable in the computer code, in the form of "section.symbol".
 
-## User input
+## System specification
+
+These are the what uniquely define the system design. Every other value is deterministically caclated from these variables. These are the user input in FSEC's online express design application.
 
 | Description                                                   | Symbol                                  | Unit |
 |:--------------------------------------------------------------|:----------------------------------------|:-----|
@@ -19,18 +21,9 @@ Note: For each section the symbols are perpended by a section name when stored a
 | Maximum Number of Series-Connected Modules per Source Circuit | array.largest_string                    | ea.  |
 | Minimum Number of Series-Connected Modules per Source Circuit | array.smallest_string                   | ea.  |
 | Minimum Distance Above Roof (in)                              | module.array_offset_from_roof           | in.  |
-| Grid type                                                     | interconnection.grid_type               |      |
-| Grid options                                                  | interconnection.grid_options            |      |
-| Connection type                                               | interconnection.connection_type         |      |
-| Inveter subpanel used (Yes/No)?                               | interconnection.subpanel                |      |
-| Inverter Subpanel Feeder Size                                 | subpanel.size                           | A    |
-| Inverter Subpanel Feeder Insulation Type                      | subpanel.insulation_type                | A    |
-| Inverter Subpanel Feeder Ampacity @ 75C                       | subpanel.ampacity                       | A    |
-| Inverter Subpanel Feeder Supply OCPD Rating (A)               | subpanel.supply_OCPD_rating             | A    |
-| Inverter Subpanel Busbar Rating (A)                           | subpanel.busbar_rating                  | A    |
-| Sum of Inverter Output Overcurrent Protection Devices (A)     | subpanel.OCPD_sum                       | A    |
-| Sum of Inverter(s) Output Circuit Current (A)                 | subpanel.inverter_output_current        | A    |
-| Total of Load Breakers                                        | subpanel.load_breakers_sum              | A    |
+| Grid type                                                     | interconnection.grid_type               | -    |
+| Grid options                                                  | interconnection.grid_options            | -    |
+| Connection type                                               | interconnection.connection_type         | -    |
 | Main panel supply OCPD rating (A)                             | interconnection.supply_ocpd_rating      | A    |
 | Main panel busbar rating (A)                                  | interconnection.bussbar_rating          | A    |
 | Sum of inverter output overcurrent protection devices (A)     | interconnection.inverter_ocpd_dev_sum   | A    |
@@ -41,12 +34,15 @@ Note: For each section the symbols are perpended by a section name when stored a
 
 ## Constants
 
+These are fixed values that are not calculated or provided by the user.
+
 | Description                                             | Symbol                       | Limits               | Value used | Unit |
 |:--------------------------------------------------------|:-----------------------------|:---------------------|:-----------|:-----|
 | 2% Maximum Temperature                                  | array.max_temp               | In Florida: 30 to 36 | 36         | °C   |
 | Extreme Annual Mean Minimum Design Dry Bulb Temperature | array.min_temp               | In Florida: -9 to 11 | -9         | °C   |
 | Maximum Voltage Rating?                                 | array.code_limit_max_voltage | 600                  | 600        | V    |
 
+The most extreme temperatures are used so that the designed system is usable anywhere in Florida.
 
 Javascript:
 
