@@ -62,6 +62,13 @@ var calculate_system = function(system_settings){
   var interconnection = system_settings.state.system.interconnection;
   var circuits = system_settings.state.system.circuits;
 
+  var error_check = {};
+
+  var report_error = function(error_message){
+    notes.errors.push(error_message);
+  };
+
+
   ///////////////////
   // data fixes
 
@@ -87,6 +94,3 @@ var calculate_system = function(system_settings){
   ///////////////////////////////////////////
   /// calculations from standard document ///
   ///////////////////////////////////////////
-
-
-  
