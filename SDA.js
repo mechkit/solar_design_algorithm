@@ -8,49 +8,6 @@ var PI = function(){
   return math.pi;
 };
 
-var lookup = function(search_key, table, col, reverse, allow_exact){
-  if( col === undefined ){ col = 1; }
-  if( reverse === undefined ){ reverse = false; }
-  if( allow_exact === undefined ){ allow_exact = false; }
-  var key_last_match;
-
-  if( isNaN(search_key) ){ // search_key is string, not a number
-    if( table[search_key] !== undefined ){
-      key_last_match = search_key;
-    } else {
-      return false;
-    }
-  } else { // else is number
-    var search_value = Number(search_key);
-    key_last_match = Object.keys(table)[0];
-    for( var key in table){
-      var key_number = Number(key);
-      if( (key_number === search_value) && (reverse == allow_exact) ){ // Exact match
-      //if( key_number === search_value ){ // Exact match
-        key_last_match = key;
-        break;
-      } else if( search_value > key_number && !reverse ){ // Possible match, but we might find a closer one.
-        key_last_match = key;
-      } else if( search_value < key_number && reverse ){ // Possible match, but we might find a closer one.
-        key_last_match = key;
-        break;
-      }
-    }
-  }
-  var return_value;
-  if( col === 0 ){
-    return_value = key_last_match;
-  } else {
-    return_value = table[key_last_match][col-1];
-  }
-
-  if( ! isNaN(return_value) ){
-    return_value = Number(return_value);
-  }
-
-  return return_value;
-};
-
 var calculate_system = function(system_settings){
   var notes = system_settings.state.notes;
 
@@ -61,6 +18,13 @@ var calculate_system = function(system_settings){
   var inverter = system_settings.state.system.inverter;
   var interconnection = system_settings.state.system.interconnection;
   var circuits = system_settings.state.system.circuits;
+
+  var error_check = {};
+
+  var report_error = function(error_message){
+    notes.errors.push(error_message);
+  };
+
 
   ///////////////////
   // data fixes
@@ -87,15 +51,54 @@ var calculate_system = function(system_settings){
   ///////////////////////////////////////////
   /// calculations from standard document ///
   ///////////////////////////////////////////
-
-
-  
   array.max_temp = 36;
   array.min_temp = -9;
   array.code_limit_max_voltage = 600;
+  source.max_power = module.pmp * array.largest_string;
+  source.voc = module.voc * array.largest_string;
+  source.isc = module.isc;
+  source.vmp = module.vmp * array.largest_string;
+  source.imp = module.imp;
+  source.Isc_adjusted = module.isc * 1.25;
+  array.voltage_correction_factor = sf.if( array.min_temp < -5, 1.12, 1.14);
+  array.max_sys_voltage_1 = source.voc * array.voltage_correction_factor;
+  array.max_sys_voltage_2 = source.voc * ( 1 + module.tc_voc_percent / 100 * ( array.min_temp - 25));
+  array.max_sys_voltage = sf.max( array.max_sys_voltage_1, array.max_sys_voltage_2 );
+  array.min_voltage = array.smallest_string * module.vmp * ( 1 + module.tc_vpmax_percent / 100 * ( array.max_temp - 25 ) );
+  array.pmp = array.num_of_modules * module.pmp;
+  array.voc = source.voc;
+  array.isc = module.isc * array.num_of_strings;
+  array.vmp = module.vmp * array.largest_string;
+  array.imp = module.imp * array.num_of_strings;
+  array.isc_adjusted = array.isc * 1.25;
+  array.vmp_adjusted = array.max_sys_voltage_2;
+  array.circuits_per_MPPT = Math.ceil( array.num_of_strings / inverter.mppt_channels );
+  array.combined_isc = source.isc * array.circuits_per_MPPT;
+  array.combined_isc_adjusted = module.isc * 1.25 * array.circuits_per_MPPT;
+  array.max_sys_voltage_2 = array.max_sys_voltage_2;
+  error_check['array_test_1'] = array.max_sys_voltage > module.max_system_v;
+  if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the modules max system voltage.' );}
+  error_check['array_test_2'] = array.max_sys_voltage > array.code_limit_max_voltage;
+  if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the maximum voltage allows by code.' );}
+  error_check['array_test_3'] = array.max_sys_voltage > inverter.vmax;
+  if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the inverter maximum voltage rating' );}
+  error_check['array_test_4'] = array.min_voltage < inverter.voltage_range_min;
+  if(error_check[ 'array_test_1' ]){ report_error( 'Minimum Array Vmp is less than the inverter minimum operating voltage.' );}
+  array.power_check_inverter = array.pmp > 10000;
+  if( error_check.array.power_check_inverter ){ report_error( 'Array voltage exceeds 10kW' );}
+  array.current_check_inverter = array.combined_isc > inverter.imax_channel;
+  if( error_check.array.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' );}
   inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
   inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
   inverter.max_ac_output_current = inverter['max_ac_ouput_current_'+inverter.grid_voltage];
+  interconnection.subpanel = inverter.grid_voltage;
+  interconnection.check_1 = ( ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating;
+  interconnection.check_2 = ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2;
+  interconnection.check_3 = ( interconnection.inverter_ocpd_dev_sum + interconnection.load_breaker_total ) > interconnection.bussbar_rating;
+  interconnection.bus_pass = sf.and( interconnection.check_1, interconnection.check_2, interconnection.check_3 );
+  if( error_check.interconnection.bus_pass ){ report_error( 'The busbar is not compliant.' )};
+  interconnection.check_4 = interconnection.supply_ocpd_rating > interconnection.bussbar_rating;
+  if( error_check.interconnection.check_4 ){ report_error( 'The rating of the overcurrent device protecting the busbar exceeds the rating of the busbar. ' )};
 
 
   ///////////////////////////////////////////////
