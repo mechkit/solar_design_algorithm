@@ -3,7 +3,7 @@
 The document below defines the calculations used to design and evaluate a PV system in preparation for creating electrical drawings.
 Most of the computer code is detailed below, and the full system calculation code is found [here](https://github.com/kshowalter/SPD_server/blob/master/lib/calculate_system.js). This algorithm is currently implemented in Javascript. The "Javascript" labeled boxes below is the actual code used in FSEC's application code.
 
-Note: For each section the symbols are prepended by a section name when stored as a variable in the computer code, in the form of "section.symbol".
+Note: For each section the symbols are pre-pended by a section name when stored as a variable in the computer code, in the form of "section.symbol".
 
 ## System specification
 
@@ -156,28 +156,28 @@ Javascript:
 The maximum array voltage is must not exceed the maximum system voltage allowed by the module.
 
     error_check['array_test_1'] = array.max_sys_voltage > module.max_system_v;
-    if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the modules max system voltage.' )};
+    if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the modules max system voltage.' );}
 
 The maximum array voltage is must not exceed the maximum system voltage allowed by the building code.
 
     error_check['array_test_2'] = array.max_sys_voltage > array.code_limit_max_voltage;
-    if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the maximum voltage allows by code.' )};
+    if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the maximum voltage allows by code.' );}
 
 The maximum array voltage is must not exceed the maximum system voltage allowed by the inverter.
 
     error_check['array_test_3'] = array.max_sys_voltage > inverter.vmax;
-    if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the inverter maximum voltage rating' )};
+    if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the inverter maximum voltage rating' );}
 
 The minimum array voltage must be greater than the inverter minimum operating voltage.
 
     error_check['array_test_4'] = array.min_voltage < inverter.voltage_range_min;
-    if(error_check[ 'array_test_1' ]){ report_error( 'Minimum Array Vmp is less than the inverter minimum operating voltage.' )};
+    if(error_check[ 'array_test_1' ]){ report_error( 'Minimum Array Vmp is less than the inverter minimum operating voltage.' );}
 
     array.power_check_inverter = array.pmp > 10000;
-    if( error_check.array.power_check_inverter ){ report_error( 'Array voltage exceeds 10kW' )};
+    if( error_check.array.power_check_inverter ){ report_error( 'Array voltage exceeds 10kW' );}
 
     array.current_check_inverter = array.combined_isc > inverter.imax_channel;
-    if( error_check.array.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' )};
+    if( error_check.array.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' );}
 
 
 
@@ -197,7 +197,6 @@ max_ac_output_current = max_ac_ouput_current_240
     inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
     inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
     inverter.max_ac_output_current = inverter['max_ac_ouput_current_'+inverter.grid_voltage];
-
 
 ### Interconnection
 
