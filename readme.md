@@ -2,7 +2,13 @@
 
 Solar (Photovoltaic) Design Algorithm: Instructions to design a permit ready electrical drawing for PV systems for small residential houses.
 
-View the [SDA](SDA.md).
+View the [SDA source](SDA.md).
+
+This document is used to create:
+
+  * [A printable PDF document describing the algorithm](SDA_standard.pdf).
+  * [Key computer code used in FSEC's online express drawing creation application](SDA.js).
+  * [A printable PDF document describing the algorithm and it's related computer code](SDA.pdf).
 
 ## About this document
 
