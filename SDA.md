@@ -191,15 +191,14 @@ The minimum array voltage must be greater than the inverter minimum operating vo
 
 The total array power must be less than 10,000W.
 
-    array.power_check_array = array.pmp > 10000;
-    if( error_check.array.power_check_inverter ){ report_error( 'Array voltage exceeds 10kW' );}
+    error_check.power_check_array = array.pmp > 10000;
+    if( error_check.power_check_array ){ report_error( 'Array voltage exceeds 10kW' );}
     
 
 The combined DC short circuit current from the array must be less than the maximum allowed per inverter MPPT channel.
 
-    array.current_check_inverter = array.combined_isc > inverter.imax_channel;
-    if( error_check.array.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' );}
-    
+    error_check.current_check_inverter = array.combined_isc > inverter.imax_channel;
+    if( error_check.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' );}
 
 
 ### Inverter
