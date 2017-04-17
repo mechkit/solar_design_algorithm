@@ -330,4 +330,4 @@ For each circuit, calculate the following.
       }
       circuit.conductor_size_min = circuit.conductor_size_min + ', ' + circuit.conductor_size_min;
     });
-    circuits['EXPOSED SOURCE circuit WIRING'].conductor_size_min = '10, 10';
+    circuits['exposed source circuit wiring'].conductor_size_min = '10, 10';
