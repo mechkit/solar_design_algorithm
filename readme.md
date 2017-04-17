@@ -8,7 +8,8 @@ This document is being developed to serve as a Standard released by the Florida 
 
 The source document is a text file that is used to create printable PDFs, and also directly generate the core of the computer code used in FSEC's online express drawing creation application.
 
-View the [source file](SDA.md).
+View the [source file](SDA.md)
+([raw text](https://raw.githubusercontent.com/kshowalter/solar_design_algorithm/master/SDA.md)).
 
 The secondary documents automatically created from the source:
 
