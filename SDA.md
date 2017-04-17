@@ -114,21 +114,34 @@ Module:
 
 ### Modules, source circuits, and array
 
-| Description                                                        | Symbol                          | Calculation                                                                                          | Unit |
-|:-------------------------------------------------------------------|:--------------------------------|:-----------------------------------------------------------------------------------------------------|:-----|
-| Maximum Power (W)                                                  | source.max_power                | module.pmp * array.largest_string                                                                    | W    |
-| Open-Circuit Voltage (V)                                           | source.voc                      | module.voc * array.largest_string                                                                    | V    |
-| Short-Circuit Current (A)                                          | source.isc                      | module.isc                                                                                           | A    |
-| Maximum Power Voltage (V)                                          | source.vmp                      | module.vmp * array.largest_string                                                                    | V    |
-| Maximum Power Current (A)                                          | source.imp                      | module.imp                                                                                           | A    |
-| Source Circuit Maximum Current (A), Isc x 1.25                     | source.Isc_adjusted             | module.isc * 1.25                                                                                    | A    |
-| Voltage Correction Factor                                          | array.voltage_correction_factor | sf.if( array.min_temp < -5, 1.12, 1.14)                                                              |      |
-| Maximum system voltage Option 1 ( module temp. correction factor ) | array.max_sys_voltage_2         | source.voc * ( 1 + module.tc_voc_percent / 100 * ( array.min_temp - 25))                             | V    |
-| Maximum system voltage Option 1 ( general temp. correction factor) | array.max_sys_voltage_1         | source.voc * array.voltage_correction_factor                                                         | V    |
-| Maximum system voltage                                             | array.max_sys_voltage           | sf.max( array.max_sys_voltage_1, array.max_sys_voltage_2 )                                           |      |
-| Minimum array voltage ( module temp. correction factor )           | array.min_voltage               | array.smallest_string * module.vmp * ( 1 + module.tc_vpmax_percent / 100 * ( array.max_temp - 25 ) ) | V    |
+Calculation summary:
 
-Javascript:
+| Description                                                               | Symbol                          | Calculation                                                                                          | Unit |
+|:--------------------------------------------------------------------------|:--------------------------------|:-----------------------------------------------------------------------------------------------------|:-----|
+| Maximum Power (W)                                                         | source.max_power                | module.pmp * array.largest_string                                                                    | W    |
+| Open-Circuit Voltage (V)                                                  | source.voc                      | module.voc * array.largest_string                                                                    | V    |
+| Short-Circuit Current (A)                                                 | source.isc                      | module.isc                                                                                           | A    |
+| Maximum Power Voltage (V)                                                 | source.vmp                      | module.vmp * array.largest_string                                                                    | V    |
+| Maximum Power Current (A)                                                 | source.imp                      | module.imp                                                                                           | A    |
+| Source Circuit Maximum Current (A), Isc x 1.25                            | source.Isc_adjusted             | module.isc * 1.25                                                                                    | A    |
+| Voltage Correction Factor                                                 | array.voltage_correction_factor | sf.if( array.min_temp < -5, 1.12, 1.14)                                                              |      |
+| Maximum system voltage Option 1 ( module temp. correction factor )        | array.max_sys_voltage_2         | source.voc * ( 1 + module.tc_voc_percent / 100 * ( array.min_temp - 25))                             | V    |
+| Maximum system voltage Option 1 ( general temp. correction factor)        | array.max_sys_voltage_1         | source.voc * array.voltage_correction_factor                                                         | V    |
+| Maximum system voltage                                                    | array.max_sys_voltage           | sf.max( array.max_sys_voltage_1, array.max_sys_voltage_2 )                                           |      |
+| Minimum array voltage ( module temp. correction factor )                  | array.min_voltage               | array.smallest_string * module.vmp * ( 1 + module.tc_vpmax_percent / 100 * ( array.max_temp - 25 ) ) | V    |
+| Maximum Power (W)                                                         | array.pmp                       | array.num_of_modules * module.pmp                                                                    | W    |
+| Open-Circuit Voltage (V)                                                  | array.voc                       | source.voc                                                                                           | V    |
+| Short-Circuit Current (A)                                                 | array.isc                       | module.isc * array.num_of_strings                                                                    | A    |
+| Maximum Power Voltage (V)                                                 | array.vmp                       | module.vmp * array.largest_string                                                                    | V    |
+| Maximum Power Current (A)                                                 | array.imp                       | module.imp * array.num_of_strings                                                                    | A    |
+| PV Power Source Maximum Current (A)                                       | array.isc_adjusted              | array.isc * 1.25                                                                                     | A    |
+| PV Power Source Maximum Voltage (V)                                       | array.vmp_adjusted              | array.max_sys_voltage_2                                                                              | V    |
+| PV Power Source Minimum Voltage (V)                                       | array.vmp_adjusted_min          | ???                                                                                                  |      |
+| Enter Maximum Number of Parallel Source Circuits per Output Circuit (1-2) | array.circuits_per_MPPT         | Math.ceil( array.num_of_strings / inverter.mppt_channels )                                           |      |
+| PV Output Circuit Maximum Current (A)                                     | array.combined_isc              | source.isc * array.circuits_per_MPPT                                                                 | A    |
+| PV Output Circuit Maximum Current (A), Isc x 1.25                         | array.combined_isc_adjusted     | module.isc * 1.25 * array.circuits_per_MPPT                                                          | A    |
+| Maximum PV Output Circuit Voltage at Lowest Temperature                   | array.max_sys_voltage_2         | array.max_sys_voltage_2                                                                              | V    |
+
 
     source.max_power = module.pmp * array.largest_string;
     source.voc = module.voc * array.largest_string;
@@ -173,14 +186,15 @@ The minimum array voltage must be greater than the inverter minimum operating vo
     error_check['array_test_4'] = array.min_voltage < inverter.voltage_range_min;
     if(error_check[ 'array_test_1' ]){ report_error( 'Minimum Array Vmp is less than the inverter minimum operating voltage.' );}
 
-    array.power_check_inverter = array.pmp > 10000;
+The total array power must be less than 10,000W.
+
+    array.power_check_array = array.pmp > 10000;
     if( error_check.array.power_check_inverter ){ report_error( 'Array voltage exceeds 10kW' );}
+
+The combined DC short circuit current from the array must be less than the maximum allowed per inverter MPPT channel.
 
     array.current_check_inverter = array.combined_isc > inverter.imax_channel;
     if( error_check.array.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' );}
-
-
-
 
 
 ### Inverter
@@ -200,20 +214,21 @@ max_ac_output_current = max_ac_ouput_current_240
 
 ### Interconnection
 
-| Description                                                                                                                                                                         | Symbol                  | Calculation (or validation)                                                                                                    |
-|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------|:-------------------------------------------------------------------------------------------------------------------------------|
-| The sum of 125 percent of the inverter(s) output circuit current and the rating of the overcurrent device protecting the busbar exceeded the ampacity of the busbar.                | interconnection.check_1 | ( ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating   |
-| The sum of 125 percent of the inverter(s) output circuit current and the rating of the overcurrent device protecting the busbar exceeded 120 percent of the ampacity of the busbar. | interconnection.check_2 | ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2 |
-| The sum of the ampere ratings of all overcurrent devices on panelboards exceeded the ampacity of the busbar.                                                                        | interconnection.check_3 | ( interconnection.inverter_ocpd_dev_sum + interconnection.load_breaker_total ) > interconnection.bussbar_rating                |
+At least one of the following checks must not fail:
 
-    interconnection.subpanel = inverter.grid_voltage;
+* The sum of 125 percent of the inverter(s) output circuit current and the rating of the overcurrent device protecting the busbar exceeded the ampacity of the busbar.               
+* The sum of 125 percent of the inverter(s) output circuit current and the rating of the overcurrent device protecting the busbar exceeded 120 percent of the ampacity of the busbar.
+* The sum of the ampere ratings of all overcurrent devices on panelboards exceeded the ampacity of the busbar.                                                                       
+
+
     interconnection.check_1 = ( ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating;
     interconnection.check_2 = ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2;
     interconnection.check_3 = ( interconnection.inverter_ocpd_dev_sum + interconnection.load_breaker_total ) > interconnection.bussbar_rating;
 
+    error_check.interconnection_bus_pass = sf.and( interconnection.check_1, interconnection.check_2, interconnection.check_3 );
+    if( error_check.interconnection_bus_pass ){ report_error( 'The busbar is not compliant.' )};
 
-    interconnection.bus_pass = sf.and( interconnection.check_1, interconnection.check_2, interconnection.check_3 );
-    if( error_check.interconnection.bus_pass ){ report_error( 'The busbar is not compliant.' )};
+The panel's main OCPD must not exceed the bussbar rating.
 
-    interconnection.check_4 = interconnection.supply_ocpd_rating > interconnection.bussbar_rating;
-    if( error_check.interconnection.check_4 ){ report_error( 'The rating of the overcurrent device protecting the busbar exceeds the rating of the busbar. ' )};
+    error_check.interconnection_check_4 = interconnection.supply_ocpd_rating > interconnection.bussbar_rating;
+    if( error_check.interconnection_check_4 ){ report_error( 'The rating of the overcurrent device protecting the busbar exceeds the rating of the busbar. ' )};
