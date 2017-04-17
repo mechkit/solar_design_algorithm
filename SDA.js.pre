@@ -25,29 +25,6 @@ var calculate_system = function(system_settings){
     notes.errors.push(error_message);
   };
 
-
-  ///////////////////
-  // data fixes
-
-  array.circuits_per_MPPT = array.circuits_per_MPPT || 1;
-  inverter.tranformerless = true;
-
-  var max_modules = array.largest_string * (array.num_of_strings-1) + array.smallest_string;
-  var min_modules = array.smallest_string * (array.num_of_strings-1) + array.largest_string;
-  if( array.num_of_modules > max_modules ){
-    notes.warnings.push('Module total exceeds the number possible with selected string sizes. Using max number of modules.');
-    array.num_of_modules = max_modules;
-  }
-  if( array.num_of_modules < min_modules ){
-    notes.warnings.push('Module total is less than the number possible with selected string sizes.');
-    array.num_of_modules = min_modules;
-  }
-
-  if( array.num_of_strings === 1 && ( array.smallest_string !== array.largest_string ) ){
-    notes.warnings.push('For a single string system, smallest and largest string should be the same. Using largest string size.');
-    array.smallest_string = array.largest_string;
-  }
-
   ///////////////////////////////////////////
   /// calculations from standard document ///
   ///////////////////////////////////////////
