@@ -8,7 +8,7 @@ var PI = function(){
   return math.pi;
 };
 
-var calculate_system = function(system_settings){
+var SDA = function(system_settings){
   var notes = system_settings.state.notes;
 
   var array = system_settings.state.system.array;
