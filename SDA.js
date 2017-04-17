@@ -84,21 +84,20 @@ var calculate_system = function(system_settings){
   if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the inverter maximum voltage rating' );}
   error_check['array_test_4'] = array.min_voltage < inverter.voltage_range_min;
   if(error_check[ 'array_test_1' ]){ report_error( 'Minimum Array Vmp is less than the inverter minimum operating voltage.' );}
-  array.power_check_inverter = array.pmp > 10000;
+  array.power_check_array = array.pmp > 10000;
   if( error_check.array.power_check_inverter ){ report_error( 'Array voltage exceeds 10kW' );}
   array.current_check_inverter = array.combined_isc > inverter.imax_channel;
   if( error_check.array.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' );}
   inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
   inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
   inverter.max_ac_output_current = inverter['max_ac_ouput_current_'+inverter.grid_voltage];
-  interconnection.subpanel = inverter.grid_voltage;
   interconnection.check_1 = ( ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating;
   interconnection.check_2 = ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2;
   interconnection.check_3 = ( interconnection.inverter_ocpd_dev_sum + interconnection.load_breaker_total ) > interconnection.bussbar_rating;
-  interconnection.bus_pass = sf.and( interconnection.check_1, interconnection.check_2, interconnection.check_3 );
-  if( error_check.interconnection.bus_pass ){ report_error( 'The busbar is not compliant.' )};
-  interconnection.check_4 = interconnection.supply_ocpd_rating > interconnection.bussbar_rating;
-  if( error_check.interconnection.check_4 ){ report_error( 'The rating of the overcurrent device protecting the busbar exceeds the rating of the busbar. ' )};
+  error_check.interconnection_bus_pass = sf.and( interconnection.check_1, interconnection.check_2, interconnection.check_3 );
+  if( error_check.interconnection_bus_pass ){ report_error( 'The busbar is not compliant.' )};
+  error_check.interconnection_check_4 = interconnection.supply_ocpd_rating > interconnection.bussbar_rating;
+  if( error_check.interconnection_check_4 ){ report_error( 'The rating of the overcurrent device protecting the busbar exceeds the rating of the busbar. ' )};
 
 
   ///////////////////////////////////////////////
