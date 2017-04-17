@@ -180,6 +180,16 @@ At least one of the following checks must not fail:
 
 
 
-
 The panel's main OCPD must not exceed the bussbar rating.
+
+
+### Conductor and conduit schedule
+
+For string inverters, this is the circuit names:
+* exposed source circuit wiring
+* pv dc source circuits
+* mppt dc input circuits
+* inverter ac output circuit
+
+For each circuit, calculate the following.
 
