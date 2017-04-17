@@ -44,8 +44,6 @@ These are fixed values that are not calculated or provided by the user.
 
 The most extreme temperatures are used so that the designed system is usable anywhere in Florida.
 
-Javascript:
-
     array.max_temp = 36;
     array.min_temp = -9;
     array.code_limit_max_voltage = 600;
