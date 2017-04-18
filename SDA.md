@@ -242,40 +242,59 @@ The panel's main OCPD must not exceed the bussbar rating.
 ### Conductor and conduit schedule
 
 For string inverters, this is the circuit names:
-* exposed source circuit wiring
-* pv dc source circuits
-* mppt dc input circuits
-* inverter ac output circuit
+* Exposed source circuit wiring: DC wires exposed on the roof.
+* PV DC source circuits: DC wires in conduit.
+* Inverter ac output circuit: AC circuits between the inverter and panel OCPD.
     
     var circuit_names = [
       'exposed source circuit wiring',
       'pv dc source circuits',
-      'mppt dc input circuits',
       'inverter ac output circuit',
     ];
     circuit_names.forEach(function(circuit_name){
       circuits[circuit_name] = {};
     });
     
+The array temperature adder is found in NEC table 310.15(B)(3)(c), with module.array_offset_from_roof as "Distance Above Roof to Bottom of Conduit (in)".
     
+    circuits['exposed source circuit wiring'].temp_adder = sf.lookup( module.array_offset_from_roof, tables[1] );
     
-    
-    
+The maximum current and voltage for the array DC circuits are equal to source.isc and source.voc. 
+
     circuits['exposed source circuit wiring'].max_current = source.isc;
     circuits['exposed source circuit wiring'].max_voltage = source.voc;
+    circuits['pv dc source circuits'].max_current         = source.isc;
+    circuits['pv dc source circuits'].max_voltage         = source.voc;
+
+The number of DC current carrying conductors is equal to twice the number of strings in the array ( array.num_of_strings * 2 ). 
+Total conductors adds one more for the ground.
+
     circuits['exposed source circuit wiring'].total_cc_conductors = ( array.num_of_strings * 2 );
-    circuits['exposed source circuit wiring'].total_conductors = ( array.num_of_strings * 2 ) + 1;
-    circuits['exposed source circuit wiring'].temp_adder = sf.lookup( module.array_offset_from_roof, tables[1] );
-    circuits['pv dc source circuits'].max_current = source.isc;
-    circuits['pv dc source circuits'].max_voltage = source.voc;
-    circuits['pv dc source circuits'].total_cc_conductors = ( array.num_of_strings * 2 );
-    circuits['pv dc source circuits'].total_conductors = ( array.num_of_strings * 2 ) + 1;
-    circuits['mppt dc input circuits'].max_current = source.isc; //* array.circuits_per_mppt;
-    circuits['mppt dc input circuits'].max_voltage = source.voc;
-    circuits['mppt dc input circuits'].total_cc_conductors = ( inverter.mppt_channels * 2 );
-    circuits['mppt dc input circuits'].total_conductors = ( inverter.mppt_channels * 2 ) +1;
-    circuits['inverter ac output circuit'].max_current = inverter.max_ac_output_current;
+    circuits['exposed source circuit wiring'].total_conductors    = ( array.num_of_strings * 2 ) + 1;
+    circuits['pv dc source circuits'].total_cc_conductors         = ( array.num_of_strings * 2 );
+    circuits['pv dc source circuits'].total_conductors            = ( array.num_of_strings * 2 ) + 1;
+
+The AC grid voltage is defined by system specifications (user input).
+
     circuits['inverter ac output circuit'].max_voltage = inverter.grid_voltage;
+
+The maximum AC output is defined by the inverter manufacturer specifications.
+
+    circuits['inverter ac output circuit'].max_current = inverter.max_ac_output_current;
+    
+AC conductors numbers are defined by the grid voltage.
+
+    var conductors_options: {
+      '120V': ['ground','neutral','L1'],
+      '240V': ['ground','neutral','L1','L2'],
+      '208V': ['ground','neutral','L1','L2'],
+      '277V': ['ground','neutral','L1'],
+      '480V Wye': ['ground','neutral','L1','L2','L3'],
+      '480V Delta': ['ground','L1','L2','L3'],
+    };
+    inverter.conductors = conductors_options[inverter.grid_voltage+'V'];
+    inverter.num_conductors = inverter.conductors.length;
+
     circuits['inverter ac output circuit'].total_cc_conductors = inverter.num_conductors - 1;
     circuits['inverter ac output circuit'].total_conductors = inverter.num_conductors;
     
@@ -283,15 +302,19 @@ For string inverters, this is the circuit names:
 For each circuit, calculate the following.
 
     circuit_names.forEach(function(circuit_name, i){
-      //circuits[circuit_name] = {};
-      //logger.info(circuit_name);
       var circuit = circuits[circuit_name];
       circuit.id = i;
+
       
       
-      
-      circuit.power_type = sf.index( ['DC', 'DC', 'DC', 'AC', 'AC'], circuit.id );
+      circuit.power_type = sf.index( ['DC', 'DC', 'AC'], circuit.id );
+      // If temperature adder is not defined, set it to 0 for use in further calculations.
       circuit.temp_adder = sf.if( circuit.temp_adder, circuit.temp_adder, 0 );
+      
+The array maximum temperature of the array is equal to the 2% maximum temperature at the install location, or nearest weather station. 
+For a state wide design, the largest maximum temperature for the state is used.
+Rooftop array circuits also have a temperature adjustment defined above.
+      
       circuit.max_conductor_temp = array.max_temp + circuit.temp_adder;
       circuit.temp_correction_factor = sf.lookup( circuit.max_conductor_temp, tables[2] );
       circuit.conductors_adj_factor = sf.lookup( circuit.total_CC_conductors , tables[3] );
