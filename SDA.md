@@ -318,19 +318,42 @@ Rooftop array circuits also have a temperature adjustment defined above.
       circuit.max_conductor_temp = array.max_temp + circuit.temp_adder;
       circuit.temp_correction_factor = sf.lookup( circuit.max_conductor_temp, tables[2] );
       circuit.conductors_adj_factor = sf.lookup( circuit.total_CC_conductors , tables[3] );
+
+There are three options to calculate the minimum required current:
+
+  1. circuit.max_current * 1.25;
+  2. circuit.max_current / ( circuit.temp_correction_factor * circuit.conductors_adj_factor );
+  3. circuit.max_current * 1.25 * 1.25;
+
+
       circuit.min_req_cond_current_1 = circuit.max_current * 1.25;
       circuit.min_req_cond_current_2 = circuit.max_current / ( circuit.temp_correction_factor * circuit.conductors_adj_factor );
       circuit.min_req_cond_current_3 = circuit.max_current * 1.25 * 1.25;
-      circuit.min_req_cond_current = sf.max( circuit.min_req_cond_current_1, circuit.min_req_cond_current_2 );
-      circuit.min_req_OCPD_current_DC = sf.max( circuit.min_req_cond_current_1, circuit.min_req_cond_current_2, circuit.min_req_cond_current_3  );
+
+For AC circuits, the maximum of 1 and 2 is used. For DC circuits, the maximum of 2 and 3 is used.
+
+      circuit.min_req_cond_current    = sf.max( circuit.min_req_cond_current_1, circuit.min_req_cond_current_2 );
+      circuit.min_req_OCPD_current_DC = sf.max( circuit.min_req_cond_current_2, circuit.min_req_cond_current_3  );
       circuit.min_req_OCPD_current = sf.if( circuit.power_type === 'DC', circuit.min_req_OCPD_current_DC, circuit.min_req_cond_current_1);
-      circuit.OCPD_required = sf.index( [false, false, false, true, true ], circuit.id );
-      circuit.ocpd_type = sf.index( ['NA', 'PV Fuse', 'NA', ' Circuit Breaker', 'Circuit Breaker'], circuit.id );
+
+For strings per MPP tracker of 2 or less, or for inverters with built in OCPD, additional DC OCPD is not required. The AC circuits do require OCPD at the panel.
+
+      circuit.OCPD_required = sf.index( [false, false, true ], circuit.id );
+      circuit.ocpd_type = sf.index( ['NA', 'PV Fuse', 'Circuit Breaker'], circuit.id );
+      
+Choose the OCPD that is greater or equal to the minimum required current.
+
       circuit.OCPD = sf.lookup( circuit.min_req_OCPD_current, tables[8], 0, true, true);
+
+Choose the conductor with a current rating that is greater than the OCPD rating from NEC table 310.15(B)(16).
+
       circuit.min_req_cond_current = sf.if( circuit.OCPD_required, circuit.OCPD, circuit.min_req_OCPD_current );
       circuit.conductor_current = sf.lookup( circuit.min_req_cond_current, tables[4], 0, true);
       circuit.conductor_size_min = sf.lookup( circuit.conductor_current, tables[4] );
-      circuit.conductor = sf.index( ['DC+/DC-, EGC', 'DC+/DC-, EGC', 'DC+/DC-, EGC', 'L1/L2, N, EGC', 'L1/L2, N, EGC, GEC'], circuit.id );
+
+
+
+      circuit.conductor = sf.index( ['DC+/DC-, EGC', 'DC+/DC-, EGC', 'L1/L2, N, EGC'], circuit.id );
       circuit.location = sf.index( ['Free air', 'Conduit/Exterior', 'Conduit/Interior', 'Conduit/Interior', 'Conduit/Exterior'], circuit.id );
       circuit.material = 'CU';
       circuit.type = sf.index( ['PV Wire, bare', 'PV Wire, bare', 'THWN-2', 'THWN-2', 'THWN-2, bare'], circuit.id );
