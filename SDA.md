@@ -231,13 +231,13 @@ At least one of the following checks must not fail:
     interconnection.check_3 = ( interconnection.inverter_ocpd_dev_sum + interconnection.load_breaker_total ) > interconnection.bussbar_rating;
     
     error_check.interconnection_bus_pass = sf.and( interconnection.check_1, interconnection.check_2, interconnection.check_3 );
-    if( error_check.interconnection_bus_pass ){ report_error( 'The busbar is not compliant.' )};
+    if( error_check.interconnection_bus_pass ){ report_error( 'The busbar is not compliant.' );}
     
 
 The panel's main OCPD must not exceed the bussbar rating.
 
     error_check.interconnection_check_4 = interconnection.supply_ocpd_rating > interconnection.bussbar_rating;
-    if( error_check.interconnection_check_4 ){ report_error( 'The rating of the overcurrent device protecting the busbar exceeds the rating of the busbar. ' )};
+    if( error_check.interconnection_check_4 ){ report_error( 'The rating of the overcurrent device protecting the busbar exceeds the rating of the busbar. ' );}
 
 ### Conductor and conduit schedule
 
@@ -261,9 +261,9 @@ The array temperature adder is found in NEC table 310.15(B)(3)(c), with module.a
     
 The maximum current and voltage for the array DC circuits are equal to source.isc and source.voc. 
 
-    circuits['exposed source circuit wiring'].max_current = source.isc;
+    circuits['exposed source circuit wiring'].max_current = array.combined_isc;
     circuits['exposed source circuit wiring'].max_voltage = source.voc;
-    circuits['pv dc source circuits'].max_current         = source.isc;
+    circuits['pv dc source circuits'].max_current         = array.combined_isc;
     circuits['pv dc source circuits'].max_voltage         = source.voc;
 
 The number of DC current carrying conductors is equal to twice the number of strings in the array ( array.num_of_strings * 2 ). 
@@ -284,7 +284,7 @@ The maximum AC output is defined by the inverter manufacturer specifications.
     
 AC conductors numbers are defined by the grid voltage.
 
-    var conductors_options: {
+    var conductors_options = {
       '120V': ['ground','neutral','L1'],
       '240V': ['ground','neutral','L1','L2'],
       '208V': ['ground','neutral','L1','L2'],
@@ -317,7 +317,7 @@ Rooftop array circuits also have a temperature adjustment defined above.
       
       circuit.max_conductor_temp = array.max_temp + circuit.temp_adder;
       circuit.temp_correction_factor = sf.lookup( circuit.max_conductor_temp, tables[2] );
-      circuit.conductors_adj_factor = sf.lookup( circuit.total_CC_conductors , tables[3] );
+      circuit.conductors_adj_factor = sf.lookup( circuit.total_cc_conductors , tables[3] );
 
 There are three options to calculate the minimum required current:
 
@@ -351,7 +351,7 @@ NEC chapter 9 table 8 provides more details on the conductor. For 'exposed sourc
       circuit.min_req_cond_current = sf.if( circuit.OCPD_required, circuit.OCPD, circuit.min_req_OCPD_current );
       circuit.conductor_current = sf.lookup( circuit.min_req_cond_current, tables[4], 0, true);
       circuit.conductor_size_min = sf.lookup( circuit.conductor_current, tables[4] );
-      if( circuit_name === 'exposed source circuit wiring' ){ circuit.conductor_size_min = '10' }
+      if( circuit_name === 'exposed source circuit wiring' ){ circuit.conductor_size_min = '10'; }
       circuit.conductor_strands = sf.lookup( circuit.conductor_size_min, tables[5], 2 );
       circuit.conductor_diameter = sf.lookup( circuit.conductor_size_min, tables[5], 3 );
       circuit.min_req_conduit_area_40 = circuit.total_conductors * ( 0.25 * PI() * circuit.conductor_diameter ^2 );
