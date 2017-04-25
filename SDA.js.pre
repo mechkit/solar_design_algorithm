@@ -18,8 +18,7 @@ var SDA = function(system_settings){
   var inverter = system_settings.state.system.inverter;
   var interconnection = system_settings.state.system.interconnection;
   var circuits = system_settings.state.system.circuits;
-
-  var error_check = {};
+  var error_check = system_settings.state.system.error_check;
 
   var report_error = function(error_message){
     notes.errors.push(error_message);
