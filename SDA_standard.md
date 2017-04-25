@@ -186,10 +186,82 @@ The panel's main OCPD must not exceed the bussbar rating.
 ### Conductor and conduit schedule
 
 For string inverters, this is the circuit names:
-* exposed source circuit wiring
-* pv dc source circuits
-* mppt dc input circuits
-* inverter ac output circuit
+* Exposed source circuit wiring: DC wires exposed on the roof.
+* PV DC source circuits: DC wires in conduit.
+* Inverter ac output circuit: AC circuits between the inverter and panel OCPD.
+The array temperature adder is found in NEC table 310.15(B)(3)(c), with module.array_offset_from_roof as "Distance Above Roof to Bottom of Conduit (in)".
+The maximum current and voltage for the array DC circuits are equal to source.isc and source.voc. 
+
+
+The number of DC current carrying conductors is equal to twice the number of strings in the array ( array.num_of_strings * 2 ). 
+Total conductors adds one more for the ground.
+
+
+The AC grid voltage is defined by system specifications (user input).
+
+
+The maximum AC output is defined by the inverter manufacturer specifications.
+
+AC conductors numbers are defined by the grid voltage.
+
+
 
 For each circuit, calculate the following.
+
+
+The array maximum temperature of the array is equal to the 2% maximum temperature at the install location, or nearest weather station. 
+For a state wide design, the largest maximum temperature for the state is used.
+Rooftop array circuits also have a temperature adjustment defined above.
+
+There are three options to calculate the minimum required current:
+
+  1. circuit.max_current * 1.25;
+  2. circuit.max_current / ( circuit.temp_correction_factor * circuit.conductors_adj_factor );
+  3. circuit.max_current * 1.25 * 1.25;
+
+
+
+For AC circuits, the maximum of 1 and 2 is used. For DC circuits, the maximum of 2 and 3 is used.
+
+
+For strings per MPP tracker of 2 or less, or for inverters with built in OCPD, additional DC OCPD is not required. The AC circuits do require OCPD at the panel.
+
+Choose the OCPD that is greater or equal to the minimum required current.
+
+
+Choose the conductor with a current rating that is greater than the OCPD rating from NEC table 310.15(B)(16). 
+NEC chapter 9 table 8 provides more details on the conductor. For 'exposed source circuit wiring', 10 AWG wire is used as a best practice. 
+
+The NEC article 352 and 358 tables are used to find a conduit with a sufficent 40% fill rate to hold the total conductor size for all the conductors.
+
+
+
+Select further wire details based on code requirements and best practices.
+
+Exposed source circuit wiring:
+* Conductor: 'DC+/DC-, EGC'
+* Location: 'Free air'
+* Material: 'CU'
+* Type: 'PV Wire, bare'
+* Volt rating: 600
+* Wet temp rating: 90
+* Conduit type: 'NA'
+
+PV DC source circuits:
+* Conductor: 'DC+/DC-, EGC'
+* Location: 'Conduit/Exterior'
+* Material: 'CU'
+* Type: 'THWN-2'
+* Volt rating: 600
+* Wet temp rating: 90
+* Conduit type: 'Metallic'
+
+Inverter ac output circuit:
+* Conductor: 'L1/L2, N, EGC'
+* Location: 'Conduit/Interior'
+* Material: 'CU'
+* Type: 'THWN-2'
+* Volt rating: 600
+* Wet temp rating: 90
+* Conduit type: 'Metallic'
 

@@ -80,15 +80,14 @@ var SDA = function(system_settings){
   interconnection.check_3 = ( interconnection.inverter_ocpd_dev_sum + interconnection.load_breaker_total ) > interconnection.bussbar_rating;
   
   error_check.interconnection_bus_pass = sf.and( interconnection.check_1, interconnection.check_2, interconnection.check_3 );
-  if( error_check.interconnection_bus_pass ){ report_error( 'The busbar is not compliant.' )};
+  if( error_check.interconnection_bus_pass ){ report_error( 'The busbar is not compliant.' );}
   
   error_check.interconnection_check_4 = interconnection.supply_ocpd_rating > interconnection.bussbar_rating;
-  if( error_check.interconnection_check_4 ){ report_error( 'The rating of the overcurrent device protecting the busbar exceeds the rating of the busbar. ' )};
+  if( error_check.interconnection_check_4 ){ report_error( 'The rating of the overcurrent device protecting the busbar exceeds the rating of the busbar. ' );}
   
   var circuit_names = [
     'exposed source circuit wiring',
     'pv dc source circuits',
-    'mppt dc input circuits',
     'inverter ac output circuit',
   ];
   circuit_names.forEach(function(circuit_name){
@@ -96,64 +95,73 @@ var SDA = function(system_settings){
   });
   
   
-  
-  
-  
-  circuits['exposed source circuit wiring'].max_current = source.isc;
-  circuits['exposed source circuit wiring'].max_voltage = source.voc;
-  circuits['exposed source circuit wiring'].total_cc_conductors = ( array.num_of_strings * 2 );
-  circuits['exposed source circuit wiring'].total_conductors = ( array.num_of_strings * 2 ) + 1;
   circuits['exposed source circuit wiring'].temp_adder = sf.lookup( module.array_offset_from_roof, tables[1] );
-  circuits['pv dc source circuits'].max_current = source.isc;
-  circuits['pv dc source circuits'].max_voltage = source.voc;
-  circuits['pv dc source circuits'].total_cc_conductors = ( array.num_of_strings * 2 );
-  circuits['pv dc source circuits'].total_conductors = ( array.num_of_strings * 2 ) + 1;
-  circuits['mppt dc input circuits'].max_current = source.isc; //* array.circuits_per_mppt;
-  circuits['mppt dc input circuits'].max_voltage = source.voc;
-  circuits['mppt dc input circuits'].total_cc_conductors = ( inverter.mppt_channels * 2 );
-  circuits['mppt dc input circuits'].total_conductors = ( inverter.mppt_channels * 2 ) +1;
-  circuits['inverter ac output circuit'].max_current = inverter.max_ac_output_current;
+  
+  circuits['exposed source circuit wiring'].max_current = array.combined_isc;
+  circuits['exposed source circuit wiring'].max_voltage = source.voc;
+  circuits['pv dc source circuits'].max_current         = array.combined_isc;
+  circuits['pv dc source circuits'].max_voltage         = source.voc;
+  circuits['exposed source circuit wiring'].total_cc_conductors = ( array.num_of_strings * 2 );
+  circuits['exposed source circuit wiring'].total_conductors    = ( array.num_of_strings * 2 ) + 1;
+  circuits['pv dc source circuits'].total_cc_conductors         = ( array.num_of_strings * 2 );
+  circuits['pv dc source circuits'].total_conductors            = ( array.num_of_strings * 2 ) + 1;
   circuits['inverter ac output circuit'].max_voltage = inverter.grid_voltage;
+  circuits['inverter ac output circuit'].max_current = inverter.max_ac_output_current;
+  
+  var conductors_options = {
+    '120V': ['ground','neutral','L1'],
+    '240V': ['ground','neutral','L1','L2'],
+    '208V': ['ground','neutral','L1','L2'],
+    '277V': ['ground','neutral','L1'],
+    '480V Wye': ['ground','neutral','L1','L2','L3'],
+    '480V Delta': ['ground','L1','L2','L3'],
+  };
+  inverter.conductors = conductors_options[inverter.grid_voltage+'V'];
+  inverter.num_conductors = inverter.conductors.length;
   circuits['inverter ac output circuit'].total_cc_conductors = inverter.num_conductors - 1;
   circuits['inverter ac output circuit'].total_conductors = inverter.num_conductors;
   
   circuit_names.forEach(function(circuit_name, i){
-    //circuits[circuit_name] = {};
-    //logger.info(circuit_name);
     var circuit = circuits[circuit_name];
     circuit.id = i;
     
     
-    
-    circuit.power_type = sf.index( ['DC', 'DC', 'DC', 'AC', 'AC'], circuit.id );
+    circuit.power_type = sf.index( ['DC', 'DC', 'AC'], circuit.id );
+    // If temperature adder is not defined, set it to 0 for use in further calculations.
     circuit.temp_adder = sf.if( circuit.temp_adder, circuit.temp_adder, 0 );
+    
+    
     circuit.max_conductor_temp = array.max_temp + circuit.temp_adder;
     circuit.temp_correction_factor = sf.lookup( circuit.max_conductor_temp, tables[2] );
-    circuit.conductors_adj_factor = sf.lookup( circuit.total_CC_conductors , tables[3] );
+    circuit.conductors_adj_factor = sf.lookup( circuit.total_cc_conductors , tables[3] );
     circuit.min_req_cond_current_1 = circuit.max_current * 1.25;
     circuit.min_req_cond_current_2 = circuit.max_current / ( circuit.temp_correction_factor * circuit.conductors_adj_factor );
     circuit.min_req_cond_current_3 = circuit.max_current * 1.25 * 1.25;
-    circuit.min_req_cond_current = sf.max( circuit.min_req_cond_current_1, circuit.min_req_cond_current_2 );
-    circuit.min_req_OCPD_current_DC = sf.max( circuit.min_req_cond_current_1, circuit.min_req_cond_current_2, circuit.min_req_cond_current_3  );
+    circuit.min_req_cond_current    = sf.max( circuit.min_req_cond_current_1, circuit.min_req_cond_current_2 );
+    circuit.min_req_OCPD_current_DC = sf.max( circuit.min_req_cond_current_2, circuit.min_req_cond_current_3  );
     circuit.min_req_OCPD_current = sf.if( circuit.power_type === 'DC', circuit.min_req_OCPD_current_DC, circuit.min_req_cond_current_1);
-    circuit.OCPD_required = sf.index( [false, false, false, true, true ], circuit.id );
-    circuit.ocpd_type = sf.index( ['NA', 'PV Fuse', 'NA', ' Circuit Breaker', 'Circuit Breaker'], circuit.id );
+    circuit.OCPD_required = sf.index( [false, false, true ], circuit.id );
+    circuit.ocpd_type = sf.index( ['NA', 'PV Fuse', 'Circuit Breaker'], circuit.id );
+    
     circuit.OCPD = sf.lookup( circuit.min_req_OCPD_current, tables[8], 0, true, true);
     circuit.min_req_cond_current = sf.if( circuit.OCPD_required, circuit.OCPD, circuit.min_req_OCPD_current );
     circuit.conductor_current = sf.lookup( circuit.min_req_cond_current, tables[4], 0, true);
     circuit.conductor_size_min = sf.lookup( circuit.conductor_current, tables[4] );
-    circuit.conductor = sf.index( ['DC+/DC-, EGC', 'DC+/DC-, EGC', 'DC+/DC-, EGC', 'L1/L2, N, EGC', 'L1/L2, N, EGC, GEC'], circuit.id );
-    circuit.location = sf.index( ['Free air', 'Conduit/Exterior', 'Conduit/Interior', 'Conduit/Interior', 'Conduit/Exterior'], circuit.id );
-    circuit.material = 'CU';
-    circuit.type = sf.index( ['PV Wire, bare', 'PV Wire, bare', 'THWN-2', 'THWN-2', 'THWN-2, bare'], circuit.id );
-    circuit.volt_rating = 600;
-    circuit.wet_temp_rating = 90;
+    if( circuit_name === 'exposed source circuit wiring' ){ circuit.conductor_size_min = '10'; }
     circuit.conductor_strands = sf.lookup( circuit.conductor_size_min, tables[5], 2 );
     circuit.conductor_diameter = sf.lookup( circuit.conductor_size_min, tables[5], 3 );
-    circuit.min_req_conduit_area_40 = circuit.total_conductors * ( 0.25 * PI() * sf.lookup( circuit.conductor_size_min, tables[5], 3 ) ^2 );
-    circuit.conduit_type = sf.index( ['NA', 'Metallic', 'Metallic', 'Metallic'], circuit.id );
+    circuit.min_req_conduit_area_40 = circuit.total_conductors * ( 0.25 * PI() * circuit.conductor_diameter ^2 );
+    
     circuit.min_conduit_size_PVC_80 = sf.lookup( circuit.min_req_conduit_area_40, tables[6] );
     circuit.min_conduit_size_EMT = sf.lookup( circuit.min_req_conduit_area_40, tables[7] );
+    
+    circuit.conductor = sf.index( ['DC+/DC-, EGC', 'DC+/DC-, EGC', 'L1/L2, N, EGC'], circuit.id );
+    circuit.location = sf.index( ['Free air', 'Conduit/Exterior', 'Conduit/Interior'], circuit.id );
+    circuit.material = 'CU';
+    circuit.type = sf.index( ['PV Wire, bare', 'THWN-2', 'THWN-2'], circuit.id );
+    circuit.volt_rating = 600;
+    circuit.wet_temp_rating = 90;
+    circuit.conduit_type = sf.index( ['NA', 'Metallic', 'Metallic'], circuit.id );
     
     
     ///////
@@ -163,8 +171,9 @@ var SDA = function(system_settings){
       circuit.OCPD = '-';
     }
     circuit.conductor_size_min = circuit.conductor_size_min + ', ' + circuit.conductor_size_min;
+    //////
+    
   });
-  circuits['exposed source circuit wiring'].conductor_size_min = '10, 10';
 
   ///////////////////////////////////////////////
   /// end calculations from standard document ///
