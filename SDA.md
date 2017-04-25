@@ -12,7 +12,7 @@ Note: For each section, the symbols are pre-pended by a section name to assist w
 
 ## System specification
 
-These are the what uniquely define the system design. Every other value is deterministically caclated from these variables. These are the user input in FSEC's online express design application.
+These are the what uniquely define the system design. Every other value is deterministically calculated from these variables. These are the user input in FSEC's online express design application.
 
 | Description                                                   | Symbol                                  | Unit |
 |:--------------------------------------------------------------|:----------------------------------------|:-----|
@@ -58,7 +58,7 @@ The most extreme temperatures are used so that the designed system is usable any
 
 ## Manufacturer data
 
-The following information is taken from the manufacturer specification sheets. In our online express design application, this information is stored in FSEC's database.
+The following information is taken from the manufacturer specification sheets. In FSEC's online express design application, this information is stored in FSEC's database.
 
 Inverter:
 
@@ -72,11 +72,10 @@ Inverter:
 | MPPT maximum operating voltage (V)                                 | inverter.mppt_max                    | V    |
 | Min. dc operating voltage (V)                                      | inverter.voltage_range_min           | V    |
 | Min. dc start voltage (V)                                          | inverter.vstart                      | V    |
-| Maximum dc operating current per inverter input or MPP tracker (A) | inverter.imax_channel                | A    |
 | Number of inverter inputs or MPP trackers                          | inverter.mppt_channels               | A    |
 | Maximum OCPD Rating (A)                                            | inverter.max_ac_ocpd                 | A    |
-| Imax total                                                         | inverter.imax_total                  | A    |
-| Imax per MPPT channel                                              | inverter.imax_channel                | A    |
+| Maximum DC short circuit current per inverter input or MPP tracker | inverter.isc_channel                 |      |
+| Maximum DC operating current per inverter input or MPP tracker     | inverter.imax_channel                |      |
 | Max DC input power 120                                             | inverter.max_dc_inputpower_120       | W    |
 | Max DC input power 208                                             | inverter.max_dc_inputpower_208       | W    |
 | Max DC input power 240                                             | inverter.max_dc_inputpower_240       | W    |
@@ -92,6 +91,7 @@ Inverter:
 | Max AC output current 240                                          | inverter.max_ac_output_current_240   | V    |
 | Max AC output current 277                                          | inverter.max_ac_output_current_277   | V    |
 | Max AC output current 480                                          | inverter.max_ac_output_current_480   | V    |
+
 
 Module:
 
@@ -182,7 +182,7 @@ The maximum array voltage is must not exceed the maximum system voltage allowed 
     if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the maximum voltage allows by code.' );}
     
 
-The maximum array voltage is must not exceed the maximum system voltage allowed by the inverter.
+The maximum array voltage must not exceed the maximum system voltage allowed by the inverter.
 
     error_check['array_test_3'] = array.max_sys_voltage > inverter.vmax;
     if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the inverter maximum voltage rating' );}
@@ -200,9 +200,11 @@ The total array power must be less than 10,000W.
     if( error_check.power_check_array ){ report_error( 'Array voltage exceeds 10kW' );}
     
 
-The combined DC short circuit current from the array must be less than the maximum allowed per inverter MPPT channel.
+The combined DC short circuit current from the array must be less than the maximum allowed per inverter MPPT channel. 
+The combined current is the total current per MPP tracker input. 
+A correction factor of 1.25 is applied to the STC module Isc to account for high irradiance conditions.
 
-    error_check.current_check_inverter = array.combined_isc > inverter.imax_channel;
+    error_check.current_check_inverter = ( array.combined_isc * 1.25 ) > inverter.isc_channel;
     if( error_check.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' );}
 
 
