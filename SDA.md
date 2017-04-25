@@ -1,9 +1,14 @@
 # Solar Design Algorithm
 
 The document below defines the calculations used to design and evaluate a PV system in preparation for creating electrical drawings.
-Most of the computer code is detailed below, and the full system calculation code is found [here](https://github.com/kshowalter/SPD_server/blob/master/lib/calculate_system.js). This algorithm is currently implemented in Javascript. The "Javascript" labeled boxes below is the actual code used in FSEC's application code.
 
-Note: For each section the symbols are pre-pended by a section name when stored as a variable in the computer code, in the form of "section.symbol".
+The secondary documents are automatically created from this source:
+
+  * [A printable PDF document describing the algorithm, with no computer code](SDA_standard.pdf).
+  * [Key computer code used in FSEC's online express drawing creation application](SDA.js).
+  * [A printable PDF document describing the algorithm and it's related computer code](SDA.pdf).
+
+Note: For each section, the symbols are pre-pended by a section name to assist with their use in the computer code, in the form of "section.symbol".
 
 ## System specification
 

@@ -13,9 +13,9 @@ View the [source file](SDA.md)
 
 The secondary documents automatically created from the source:
 
-  * [A printable PDF document describing the algorithm, with no computer code.](SDA_standard.pdf).
-  * [Key computer code used in FSEC's online express drawing creation application.](SDA.js).
-  * [A printable PDF document describing the algorithm and it's related computer code.](SDA.pdf).
+  * [A printable PDF document describing the algorithm, with no computer code](SDA_standard.pdf).
+  * [Key computer code used in FSEC's online express drawing creation application](SDA.js).
+  * [A printable PDF document describing the algorithm and it's related computer code](SDA.pdf).
 
 ## Contributing to the Standard
 
