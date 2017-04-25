@@ -1,13 +1,18 @@
 # Solar Design Algorithm
 
 The document below defines the calculations used to design and evaluate a PV system in preparation for creating electrical drawings.
-Most of the computer code is detailed below, and the full system calculation code is found [here](https://github.com/kshowalter/SPD_server/blob/master/lib/calculate_system.js). This algorithm is currently implemented in Javascript. The "Javascript" labeled boxes below is the actual code used in FSEC's application code.
 
-Note: For each section the symbols are pre-pended by a section name when stored as a variable in the computer code, in the form of "section.symbol".
+The secondary documents are automatically created from this source:
+
+  * [A printable PDF document describing the algorithm, with no computer code](SDA_standard.pdf).
+  * [Key computer code used in FSEC's online express drawing creation application](SDA.js).
+  * [A printable PDF document describing the algorithm and it's related computer code](SDA.pdf).
+
+Note: For each section, the symbols are pre-pended by a section name to assist with their use in the computer code, in the form of "section.symbol".
 
 ## System specification
 
-These are the what uniquely define the system design. Every other value is deterministically caclated from these variables. These are the user input in FSEC's online express design application.
+These are the what uniquely define the system design. Every other value is deterministically calculated from these variables. These are the user input in FSEC's online express design application.
 
 | Description                                                   | Symbol                                  | Unit |
 |:--------------------------------------------------------------|:----------------------------------------|:-----|
@@ -50,7 +55,7 @@ The most extreme temperatures are used so that the designed system is usable any
 
 ## Manufacturer data
 
-The following information is taken from the manufacturer specification sheets. In our online express design application, this information is stored in FSEC's database.
+The following information is taken from the manufacturer specification sheets. In FSEC's online express design application, this information is stored in FSEC's database.
 
 Inverter:
 
@@ -64,11 +69,10 @@ Inverter:
 | MPPT maximum operating voltage (V)                                 | inverter.mppt_max                    | V    |
 | Min. dc operating voltage (V)                                      | inverter.voltage_range_min           | V    |
 | Min. dc start voltage (V)                                          | inverter.vstart                      | V    |
-| Maximum dc operating current per inverter input or MPP tracker (A) | inverter.imax_channel                | A    |
 | Number of inverter inputs or MPP trackers                          | inverter.mppt_channels               | A    |
 | Maximum OCPD Rating (A)                                            | inverter.max_ac_ocpd                 | A    |
-| Imax total                                                         | inverter.imax_total                  | A    |
-| Imax per MPPT channel                                              | inverter.imax_channel                | A    |
+| Maximum DC short circuit current per inverter input or MPP tracker | inverter.isc_channel                 |      |
+| Maximum DC operating current per inverter input or MPP tracker     | inverter.imax_channel                |      |
 | Max DC input power 120                                             | inverter.max_dc_inputpower_120       | W    |
 | Max DC input power 208                                             | inverter.max_dc_inputpower_208       | W    |
 | Max DC input power 240                                             | inverter.max_dc_inputpower_240       | W    |
@@ -84,6 +88,7 @@ Inverter:
 | Max AC output current 240                                          | inverter.max_ac_output_current_240   | V    |
 | Max AC output current 277                                          | inverter.max_ac_output_current_277   | V    |
 | Max AC output current 480                                          | inverter.max_ac_output_current_480   | V    |
+
 
 Module:
 
@@ -145,7 +150,7 @@ The maximum array voltage is must not exceed the maximum system voltage allowed 
 The maximum array voltage is must not exceed the maximum system voltage allowed by the building code.
 
 
-The maximum array voltage is must not exceed the maximum system voltage allowed by the inverter.
+The maximum array voltage must not exceed the maximum system voltage allowed by the inverter.
 
 
 The minimum array voltage must be greater than the inverter minimum operating voltage.
@@ -154,7 +159,9 @@ The minimum array voltage must be greater than the inverter minimum operating vo
 The total array power must be less than 10,000W.
 
 
-The combined DC short circuit current from the array must be less than the maximum allowed per inverter MPPT channel.
+The combined DC short circuit current from the array must be less than the maximum allowed per inverter MPPT channel. 
+The combined current is the total current per MPP tracker input. 
+A correction factor of 1.25 is applied to the STC module Isc to account for high irradiance conditions.
 
 
 

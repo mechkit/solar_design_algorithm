@@ -18,8 +18,7 @@ var SDA = function(system_settings){
   var inverter = system_settings.state.system.inverter;
   var interconnection = system_settings.state.system.interconnection;
   var circuits = system_settings.state.system.circuits;
-
-  var error_check = {};
+  var error_check = system_settings.state.system.error_check;
 
   var report_error = function(error_message){
     notes.errors.push(error_message);
@@ -69,7 +68,7 @@ var SDA = function(system_settings){
   error_check.power_check_array = array.pmp > 10000;
   if( error_check.power_check_array ){ report_error( 'Array voltage exceeds 10kW' );}
   
-  error_check.current_check_inverter = array.combined_isc > inverter.imax_channel;
+  error_check.current_check_inverter = ( array.combined_isc * 1.25 ) > inverter.isc_channel;
   if( error_check.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' );}
   inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
   inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
