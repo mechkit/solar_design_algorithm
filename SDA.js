@@ -74,15 +74,6 @@ var SDA = function(system_settings){
   inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
   inverter.max_ac_output_current = inverter['max_ac_ouput_current_'+inverter.grid_voltage];
   
-  interconnection.check_1 = ( ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating;
-  interconnection.check_2 = ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2;
-  interconnection.check_3 = ( interconnection.inverter_ocpd_dev_sum + interconnection.load_breaker_total ) > interconnection.bussbar_rating;
-  
-  error_check.interconnection_bus_pass = sf.and( interconnection.check_1, interconnection.check_2, interconnection.check_3 );
-  if( error_check.interconnection_bus_pass ){ report_error( 'The busbar is not compliant.' );}
-  
-  error_check.interconnection_check_4 = interconnection.supply_ocpd_rating > interconnection.bussbar_rating;
-  if( error_check.interconnection_check_4 ){ report_error( 'The rating of the overcurrent device protecting the busbar exceeds the rating of the busbar. ' );}
   
   var circuit_names = [
     'exposed source circuit wiring',
@@ -143,6 +134,7 @@ var SDA = function(system_settings){
     circuit.ocpd_type = sf.index( ['NA', 'PV Fuse', 'Circuit Breaker'], circuit.id );
     
     circuit.OCPD = sf.lookup( circuit.min_req_OCPD_current, tables[8], 0, true, true);
+    if( circuit_name === 'inverter ac output circuit' ){ inverter.OCPD = circuit.OCPD; }
     circuit.min_req_cond_current = sf.if( circuit.OCPD_required, circuit.OCPD, circuit.min_req_OCPD_current );
     circuit.conductor_current = sf.lookup( circuit.min_req_cond_current, tables[4], 0, true);
     circuit.conductor_size_min = sf.lookup( circuit.conductor_current, tables[4] );
@@ -173,6 +165,17 @@ var SDA = function(system_settings){
     //////
     
   });
+  interconnection.inverter_output_cur_sum = interconnection.inverter_output_cur_sum || inverter.max_ac_output_current;
+  interconnection.inverter_ocpd_dev_sum = interconnection.inverter_ocpd_dev_sum || inverter.OCPD;
+  interconnection.check_1 = ( ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating;
+  interconnection.check_2 = ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2;
+  interconnection.check_3 = ( interconnection.inverter_ocpd_dev_sum + interconnection.load_breaker_total ) > interconnection.bussbar_rating;
+  
+  error_check.interconnection_bus_pass = sf.and( interconnection.check_1, interconnection.check_2, interconnection.check_3 );
+  if( error_check.interconnection_bus_pass ){ report_error( 'The busbar is not compliant.' );}
+  
+  error_check.interconnection_check_4 = interconnection.supply_ocpd_rating > interconnection.bussbar_rating;
+  if( error_check.interconnection_check_4 ){ report_error( 'The rating of the overcurrent device protecting the busbar exceeds the rating of the busbar. ' );}
 
   ///////////////////////////////////////////////
   /// end calculations from standard document ///
