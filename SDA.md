@@ -224,27 +224,7 @@ max_ac_output_current = max_ac_ouput_current_240
     inverter.max_ac_output_current = inverter['max_ac_ouput_current_'+inverter.grid_voltage];
     
 
-### Interconnection
 
-At least one of the following checks must not fail:
-
-* The sum of 125 percent of the inverter(s) output circuit current and the rating of the overcurrent device protecting the busbar exceeded the ampacity of the busbar.               
-* The sum of 125 percent of the inverter(s) output circuit current and the rating of the overcurrent device protecting the busbar exceeded 120 percent of the ampacity of the busbar.
-* The sum of the ampere ratings of all overcurrent devices on panelboards exceeded the ampacity of the busbar.                                                                       
-
-
-    interconnection.check_1 = ( ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating;
-    interconnection.check_2 = ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2;
-    interconnection.check_3 = ( interconnection.inverter_ocpd_dev_sum + interconnection.load_breaker_total ) > interconnection.bussbar_rating;
-    
-    error_check.interconnection_bus_pass = sf.and( interconnection.check_1, interconnection.check_2, interconnection.check_3 );
-    if( error_check.interconnection_bus_pass ){ report_error( 'The busbar is not compliant.' );}
-    
-
-The panel's main OCPD must not exceed the bussbar rating.
-
-    error_check.interconnection_check_4 = interconnection.supply_ocpd_rating > interconnection.bussbar_rating;
-    if( error_check.interconnection_check_4 ){ report_error( 'The rating of the overcurrent device protecting the busbar exceeds the rating of the busbar. ' );}
 
 ### Conductor and conduit schedule
 
@@ -418,3 +398,27 @@ Inverter ac output circuit:
       //////
       
     });
+
+
+
+### Interconnection
+
+At least one of the following checks must not fail:
+
+* The sum of 125 percent of the inverter(s) output circuit current and the rating of the overcurrent device protecting the busbar exceeded the ampacity of the busbar.               
+* The sum of 125 percent of the inverter(s) output circuit current and the rating of the overcurrent device protecting the busbar exceeded 120 percent of the ampacity of the busbar.
+* The sum of the ampere ratings of all overcurrent devices on panelboards exceeded the ampacity of the busbar.                                                                       
+
+
+    interconnection.check_1 = ( ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating;
+    interconnection.check_2 = ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2;
+    interconnection.check_3 = ( interconnection.inverter_ocpd_dev_sum + interconnection.load_breaker_total ) > interconnection.bussbar_rating;
+    
+    error_check.interconnection_bus_pass = sf.and( interconnection.check_1, interconnection.check_2, interconnection.check_3 );
+    if( error_check.interconnection_bus_pass ){ report_error( 'The busbar is not compliant.' );}
+    
+
+The panel's main OCPD must not exceed the bussbar rating.
+
+    error_check.interconnection_check_4 = interconnection.supply_ocpd_rating > interconnection.bussbar_rating;
+    if( error_check.interconnection_check_4 ){ report_error( 'The rating of the overcurrent device protecting the busbar exceeds the rating of the busbar. ' );}
