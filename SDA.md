@@ -14,26 +14,21 @@ Note: For each section, the symbols are pre-pended by a section name to assist w
 
 These are the what uniquely define the system design. Every other value is deterministically calculated from these variables. These are the user input in FSEC's online express design application.
 
-| Description                                                   | Symbol                                  | Unit |
-|:--------------------------------------------------------------|:----------------------------------------|:-----|
-| Inverter manufacturer name                                    | inverter.manufacturer_name              | -    |
-| Inverter model                                                | inverter.device_model_number            | -    |
-| Module manufacturer name                                      | array.manufacturer_name                 | -    |
-| Module model                                                  | array.device_model_number               | -    |
-| Grid voltage                                                  | inverter.grid_voltage                   | V    |
-| Number of PV Source Circuits                                  | array.num_of_strings                    | ea.  |
-| Total Number of Modules                                       | array.num_of_modules                    | ea.  |
-| Maximum Number of Series-Connected Modules per Source Circuit | array.largest_string                    | ea.  |
-| Minimum Number of Series-Connected Modules per Source Circuit | array.smallest_string                   | ea.  |
-| Minimum Distance Above Roof (in)                              | module.array_offset_from_roof           | in.  |
-| Grid type                                                     | interconnection.grid_type               | -    |
-| Grid options                                                  | interconnection.grid_options            | -    |
-| Connection type                                               | interconnection.connection_type         | -    |
-| Main panel supply OCPD rating (A)                             | interconnection.supply_ocpd_rating      | A    |
-| Main panel busbar rating (A)                                  | interconnection.bussbar_rating          | A    |
-| Sum of inverter output overcurrent protection devices (A)     | interconnection.inverter_ocpd_dev_sum   | A    |
-| Sum of inverter(s) output circuit current (A)                 | interconnection.inverter_output_cur_sum | A    |
-| Total of load breakers (A)                                    | interconnection.load_breaker_total      | A    |
+| Description                                                   | Symbol                             | Unit |
+|:--------------------------------------------------------------|:-----------------------------------|:-----|
+| Inverter manufacturer name                                    | inverter.manufacturer_name         | -    |
+| Inverter model                                                | inverter.device_model_number       | -    |
+| Module manufacturer name                                      | array.manufacturer_name            | -    |
+| Module model                                                  | array.device_model_number          | -    |
+| Grid voltage                                                  | inverter.grid_voltage              | V    |
+| Number of PV Source Circuits                                  | array.num_of_strings               | ea.  |
+| Total Number of Modules                                       | array.num_of_modules               | ea.  |
+| Maximum Number of Series-Connected Modules per Source Circuit | array.largest_string               | ea.  |
+| Minimum Number of Series-Connected Modules per Source Circuit | array.smallest_string              | ea.  |
+| Minimum Distance Above Roof (in)                              | module.array_offset_from_roof      | in.  |
+| Main panel supply OCPD rating (A)                             | interconnection.supply_ocpd_rating | A    |
+| Main panel busbar rating (A)                                  | interconnection.bussbar_rating     | A    |
+| Total of load breakers (A)                                    | interconnection.load_breaker_total | A    |
 
 
 
@@ -331,6 +326,7 @@ For strings per MPP tracker of 2 or less, or for inverters with built in OCPD, a
 Choose the OCPD that is greater or equal to the minimum required current.
 
       circuit.OCPD = sf.lookup( circuit.min_req_OCPD_current, tables[8], 0, true, true);
+      if( circuit_name === 'inverter ac output circuit' ){ inverter.OCPD = circuit.OCPD; }
 
 Choose the conductor with a current rating that is greater than the OCPD rating from NEC table 310.15(B)(16). 
 NEC chapter 9 table 8 provides more details on the conductor. For 'exposed source circuit wiring', 10 AWG wire is used as a best practice. 
@@ -410,9 +406,9 @@ At least one of the following checks must not fail:
 * The sum of the ampere ratings of all overcurrent devices on panelboards exceeded the ampacity of the busbar.                                                                       
 
 
-    interconnection.check_1 = ( ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating;
-    interconnection.check_2 = ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2;
-    interconnection.check_3 = ( interconnection.inverter_ocpd_dev_sum + interconnection.load_breaker_total ) > interconnection.bussbar_rating;
+    interconnection.check_1 = ( ( inverter.max_ac_output_current * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating;
+    interconnection.check_2 = ( inverter.max_ac_output_current * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2;
+    interconnection.check_3 = ( inverter.OCPD + interconnection.load_breaker_total ) > interconnection.bussbar_rating;
     
     error_check.interconnection_bus_pass = sf.and( interconnection.check_1, interconnection.check_2, interconnection.check_3 );
     if( error_check.interconnection_bus_pass ){ report_error( 'The busbar is not compliant.' );}
