@@ -14,26 +14,21 @@ Note: For each section, the symbols are pre-pended by a section name to assist w
 
 These are the what uniquely define the system design. Every other value is deterministically calculated from these variables. These are the user input in FSEC's online express design application.
 
-| Description                                                   | Symbol                                  | Unit |
-|:--------------------------------------------------------------|:----------------------------------------|:-----|
-| Inverter manufacturer name                                    | inverter.manufacturer_name              | -    |
-| Inverter model                                                | inverter.device_model_number            | -    |
-| Module manufacturer name                                      | array.manufacturer_name                 | -    |
-| Module model                                                  | array.device_model_number               | -    |
-| Grid voltage                                                  | inverter.grid_voltage                   | V    |
-| Number of PV Source Circuits                                  | array.num_of_strings                    | ea.  |
-| Total Number of Modules                                       | array.num_of_modules                    | ea.  |
-| Maximum Number of Series-Connected Modules per Source Circuit | array.largest_string                    | ea.  |
-| Minimum Number of Series-Connected Modules per Source Circuit | array.smallest_string                   | ea.  |
-| Minimum Distance Above Roof (in)                              | module.array_offset_from_roof           | in.  |
-| Grid type                                                     | interconnection.grid_type               | -    |
-| Grid options                                                  | interconnection.grid_options            | -    |
-| Connection type                                               | interconnection.connection_type         | -    |
-| Main panel supply OCPD rating (A)                             | interconnection.supply_ocpd_rating      | A    |
-| Main panel busbar rating (A)                                  | interconnection.bussbar_rating          | A    |
-| Sum of inverter output overcurrent protection devices (A)     | interconnection.inverter_ocpd_dev_sum   | A    |
-| Sum of inverter(s) output circuit current (A)                 | interconnection.inverter_output_cur_sum | A    |
-| Total of load breakers (A)                                    | interconnection.load_breaker_total      | A    |
+| Description                                                   | Symbol                             | Unit |
+|:--------------------------------------------------------------|:-----------------------------------|:-----|
+| Inverter manufacturer name                                    | inverter.manufacturer_name         | -    |
+| Inverter model                                                | inverter.device_model_number       | -    |
+| Module manufacturer name                                      | array.manufacturer_name            | -    |
+| Module model                                                  | array.device_model_number          | -    |
+| Grid voltage                                                  | inverter.grid_voltage              | V    |
+| Number of PV Source Circuits                                  | array.num_of_strings               | ea.  |
+| Total Number of Modules                                       | array.num_of_modules               | ea.  |
+| Maximum Number of Series-Connected Modules per Source Circuit | array.largest_string               | ea.  |
+| Minimum Number of Series-Connected Modules per Source Circuit | array.smallest_string              | ea.  |
+| Minimum Distance Above Roof (in)                              | module.array_offset_from_roof      | in.  |
+| Main panel supply OCPD rating (A)                             | interconnection.supply_ocpd_rating | A    |
+| Main panel busbar rating (A)                                  | interconnection.bussbar_rating     | A    |
+| Total of load breakers (A)                                    | interconnection.load_breaker_total | A    |
 
 
 
@@ -177,17 +172,6 @@ nominal_ac_output_power = nominal_ac_output_power_240
 max_ac_output_current = max_ac_ouput_current_240
 
 
-### Interconnection
-
-At least one of the following checks must not fail:
-
-* The sum of 125 percent of the inverter(s) output circuit current and the rating of the overcurrent device protecting the busbar exceeded the ampacity of the busbar.               
-* The sum of 125 percent of the inverter(s) output circuit current and the rating of the overcurrent device protecting the busbar exceeded 120 percent of the ampacity of the busbar.
-* The sum of the ampere ratings of all overcurrent devices on panelboards exceeded the ampacity of the busbar.                                                                       
-
-
-
-The panel's main OCPD must not exceed the bussbar rating.
 
 
 ### Conductor and conduit schedule
@@ -271,4 +255,19 @@ Inverter ac output circuit:
 * Volt rating: 600
 * Wet temp rating: 90
 * Conduit type: 'Metallic'
+
+
+
+
+### Interconnection
+
+At least one of the following checks must not fail:
+
+* The sum of 125 percent of the inverter(s) output circuit current and the rating of the overcurrent device protecting the busbar exceeded the ampacity of the busbar.               
+* The sum of 125 percent of the inverter(s) output circuit current and the rating of the overcurrent device protecting the busbar exceeded 120 percent of the ampacity of the busbar.
+* The sum of the ampere ratings of all overcurrent devices on panelboards exceeded the ampacity of the busbar.                                                                       
+
+
+
+The panel's main OCPD must not exceed the bussbar rating.
 

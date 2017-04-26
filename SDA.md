@@ -405,10 +405,12 @@ At least one of the following checks must not fail:
 * The sum of 125 percent of the inverter(s) output circuit current and the rating of the overcurrent device protecting the busbar exceeded 120 percent of the ampacity of the busbar.
 * The sum of the ampere ratings of all overcurrent devices on panelboards exceeded the ampacity of the busbar.                                                                       
 
+    interconnection.inverter_output_cur_sum = interconnection.inverter_output_cur_sum || inverter.max_ac_output_current;
+    interconnection.inverter_ocpd_dev_sum = interconnection.inverter_ocpd_dev_sum || inverter.OCPD;
 
-    interconnection.check_1 = ( ( inverter.max_ac_output_current * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating;
-    interconnection.check_2 = ( inverter.max_ac_output_current * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2;
-    interconnection.check_3 = ( inverter.OCPD + interconnection.load_breaker_total ) > interconnection.bussbar_rating;
+    interconnection.check_1 = ( ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating;
+    interconnection.check_2 = ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2;
+    interconnection.check_3 = ( interconnection.inverter_ocpd_dev_sum + interconnection.load_breaker_total ) > interconnection.bussbar_rating;
     
     error_check.interconnection_bus_pass = sf.and( interconnection.check_1, interconnection.check_2, interconnection.check_3 );
     if( error_check.interconnection_bus_pass ){ report_error( 'The busbar is not compliant.' );}
