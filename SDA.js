@@ -144,13 +144,25 @@ var SDA = function(system_settings){
     if( circuit_name === 'pv dc source circuits' ){ 
       circuit.conductor_size_min = '10'; 
     }
+    if( circuit_name === 'inverter ac output circuit' ){
+      if( circuit.OCPD === 15){
+        circuit.conductor_size_min = '14'; 
+      } else if( circuit.OCPD === 20){
+        circuit.conductor_size_min = '12';
+      } else if( circuit.OCPD === 25){
+        circuit.conductor_size_min = '10';
+      } else if( circuit.OCPD === 30){
+        circuit.conductor_size_min = '10';
+      }
+    }
     circuit.conductor_current = sf.lookup( circuit.conductor_size_min, tables[9], 1);
-    circuit.conductor_strands = sf.lookup( circuit.conductor_size_min, tables[5], 2 );
-    circuit.conductor_diameter = sf.lookup( circuit.conductor_size_min, tables[5], 3 );
-    circuit.min_req_conduit_area_40 = circuit.total_conductors * ( 0.25 * PI() * circuit.conductor_diameter ^2 );
+    circuit.conductor_strands = sf.lookup( circuit.conductor_size_min, tables[5], 1 );
+    circuit.conductor_diameter = sf.lookup( circuit.conductor_size_min, tables[5], 2 );
+    circuit.min_req_conduit_area_40 = circuit.total_conductors * ( 0.25 * PI() * math.pow(circuit.conductor_diameter, 2) );
     
     circuit.min_conduit_size_PVC_80 = sf.lookup( circuit.min_req_conduit_area_40, tables[6] );
     circuit.min_conduit_size_EMT = sf.lookup( circuit.min_req_conduit_area_40, tables[7] );
+    circuit.min_conduit_size = circuit.min_conduit_size_PVC_80 || circuit.min_conduit_size_EMT;
     
     circuit.conductor = sf.index( ['DC+/DC-, EGC', 'DC+/DC-, EGC', 'L1/L2, N, EGC'], circuit.id );
     circuit.location = sf.index( ['Free air', 'Conduit/Exterior', 'Conduit/Interior'], circuit.id );
