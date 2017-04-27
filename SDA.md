@@ -329,12 +329,18 @@ Choose the OCPD that is greater or equal to the minimum required current.
       if( circuit_name === 'inverter ac output circuit' ){ inverter.OCPD = circuit.OCPD; }
 
 Choose the conductor with a current rating that is greater than the OCPD rating from NEC table 310.15(B)(16). 
-NEC chapter 9 table 8 provides more details on the conductor. For 'exposed source circuit wiring', 10 AWG wire is used as a best practice. 
+NEC chapter 9 table 8 provides more details on the conductor. For DC circuits, 10 AWG wire is used as a best practice. 
 
       circuit.min_req_cond_current = sf.if( circuit.OCPD_required, circuit.OCPD, circuit.min_req_OCPD_current );
       circuit.conductor_current = sf.lookup( circuit.min_req_cond_current, tables[4], 0, true);
       circuit.conductor_size_min = sf.lookup( circuit.conductor_current, tables[4] );
-      if( circuit_name === 'exposed source circuit wiring' ){ circuit.conductor_size_min = '10'; }
+      if( circuit_name === 'exposed source circuit wiring' ){ 
+        circuit.conductor_size_min = '10'; 
+      }
+      if( circuit_name === 'pv dc source circuits' ){ 
+        circuit.conductor_size_min = '10'; 
+      }
+      circuit.conductor_current = sf.lookup( circuit.conductor_size_min, tables[9], 1);
       circuit.conductor_strands = sf.lookup( circuit.conductor_size_min, tables[5], 2 );
       circuit.conductor_diameter = sf.lookup( circuit.conductor_size_min, tables[5], 3 );
       circuit.min_req_conduit_area_40 = circuit.total_conductors * ( 0.25 * PI() * circuit.conductor_diameter ^2 );
