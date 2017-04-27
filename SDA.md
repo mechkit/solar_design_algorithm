@@ -227,7 +227,8 @@ For string inverters, this is the circuit names:
 * Exposed source circuit wiring: DC wires exposed on the roof.
 * PV DC source circuits: DC wires in conduit.
 * Inverter ac output circuit: AC circuits between the inverter and panel OCPD.
-    
+
+
     var circuit_names = [
       'exposed source circuit wiring',
       'pv dc source circuits',
@@ -422,6 +423,7 @@ At least one of the following checks must not fail:
 * The sum of 125 percent of the inverter(s) output circuit current and the rating of the overcurrent device protecting the busbar exceeded the ampacity of the busbar.               
 * The sum of 125 percent of the inverter(s) output circuit current and the rating of the overcurrent device protecting the busbar exceeded 120 percent of the ampacity of the busbar.
 * The sum of the ampere ratings of all overcurrent devices on panelboards exceeded the ampacity of the busbar.                                                                       
+
 
     interconnection.inverter_output_cur_sum = interconnection.inverter_output_cur_sum || inverter.max_ac_output_current;
     interconnection.inverter_ocpd_dev_sum = interconnection.inverter_ocpd_dev_sum || inverter.OCPD;
