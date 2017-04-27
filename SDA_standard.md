@@ -221,7 +221,7 @@ Choose the OCPD that is greater or equal to the minimum required current.
 
 
 Choose the conductor with a current rating that is greater than the OCPD rating from NEC table 310.15(B)(16). 
-NEC chapter 9 table 8 provides more details on the conductor. For 'exposed source circuit wiring', 10 AWG wire is used as a best practice. 
+NEC chapter 9 table 8 provides more details on the conductor. For DC circuits, 10 AWG wire is used as a best practice. 
 
 The NEC article 352 and 358 tables are used to find a conduit with a sufficent 40% fill rate to hold the total conductor size for all the conductors.
 

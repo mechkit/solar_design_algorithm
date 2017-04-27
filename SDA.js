@@ -138,7 +138,13 @@ var SDA = function(system_settings){
     circuit.min_req_cond_current = sf.if( circuit.OCPD_required, circuit.OCPD, circuit.min_req_OCPD_current );
     circuit.conductor_current = sf.lookup( circuit.min_req_cond_current, tables[4], 0, true);
     circuit.conductor_size_min = sf.lookup( circuit.conductor_current, tables[4] );
-    if( circuit_name === 'exposed source circuit wiring' ){ circuit.conductor_size_min = '10'; }
+    if( circuit_name === 'exposed source circuit wiring' ){ 
+      circuit.conductor_size_min = '10'; 
+    }
+    if( circuit_name === 'pv dc source circuits' ){ 
+      circuit.conductor_size_min = '10'; 
+    }
+    circuit.conductor_current = sf.lookup( circuit.conductor_size_min, tables[9], 1);
     circuit.conductor_strands = sf.lookup( circuit.conductor_size_min, tables[5], 2 );
     circuit.conductor_diameter = sf.lookup( circuit.conductor_size_min, tables[5], 3 );
     circuit.min_req_conduit_area_40 = circuit.total_conductors * ( 0.25 * PI() * circuit.conductor_diameter ^2 );
