@@ -1,11 +1,13 @@
-# SDA Tables
+# SDA appendix
+
+## Tables
 
 Search the first column for the value that is equal to, or the next lowest to the searched value. 
 If reversed, the next highest value is selected. Select the returned value in the selected column.
 
 When NEC tables show a range of values, the lower one is used in the following tables. When using the the method above, the correct NEC range is selected.
 
-## Table 1
+### Table 1
 NEC TABLE 310.15(B)(3)(c)
 
 Ambient Temperature Adjustment for Circular Raceways Exposed to Sunlight on or Above Rooftops
@@ -32,7 +34,7 @@ Ambient Temperature Adjustment for Circular Raceways Exposed to Sunlight on or A
     },
 
 
-## Table 2
+### Table 2
 NEC TABLE 310.15(B)(2)(a)
 
 Ambient Temperature Correction Factors Based on 30 C
@@ -81,7 +83,7 @@ Ambient Temperature Correction Factors Based on 30 C
     },
 
 
-## Table 3
+### Table 3
 NEC TABLE 310.15(B)(3)(a)
 
 Adjustment Factors for More Than Three Current-Carrying Conductors in a Raceway or Cable
@@ -114,7 +116,7 @@ Adjustment Factors for More Than Three Current-Carrying Conductors in a Raceway 
 
 ---
 
-## Table 4
+### Table 4
 TABLE 310.15(B)(16)
 
 Allowable Ampacities of Single Insulated Conductors, Not More Than Three Current-Carrying Conductors is Raceway, Cable or Direct Burial, Based on Temperature of 30 C
@@ -162,7 +164,7 @@ Allowable Ampacities of Single Insulated Conductors, Not More Than Three Current
     },
 
 
-## Table 5
+### Table 5
 This is the same as Table 4, but with reversed column order.
 
 TABLE 310.15(B)(16)
@@ -212,7 +214,7 @@ Allowable Ampacities of Single Insulated Conductors, Not More Than Three Current
 
 ---
 
-## Table 6
+### Table 6
 NEC Chapter 9 Table 8
 
 Conductor Properties
@@ -262,7 +264,7 @@ Conductor Properties
 
 
 
-## Table 7
+### Table 7
 Article 352
 
 Rigid PVC Conduit (PVC), Schedule 80
@@ -301,7 +303,7 @@ Rigid PVC Conduit (PVC), Schedule 80
 
 
 
-## Table 8
+### Table 8
 Article 358
 
 Electrical Metallic Tubing (EMT)
@@ -340,7 +342,7 @@ Electrical Metallic Tubing (EMT)
 
 ---
 
-## Table 9
+### Table 9
 240.6 Standard OCPD Ampere Ratings
 
 | OCPD (A) |
@@ -404,7 +406,7 @@ Electrical Metallic Tubing (EMT)
 
 
 
-## Table 10
+### Table 10
 Table 690.7 Voltage Correction Factors
 
 Lowest-Expected Ambient Temperature
