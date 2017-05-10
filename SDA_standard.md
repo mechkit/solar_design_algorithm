@@ -36,13 +36,16 @@ These are the what uniquely define the system design. Every other value is deter
 
 These are fixed values that are not calculated or provided by the user.
 
-| Description                                             | Symbol                       | Limits               | Value used | Unit |
-|:--------------------------------------------------------|:-----------------------------|:---------------------|:-----------|:-----|
-| 2% Maximum Temperature                                  | array.max_temp               | In Florida: 30 to 36 | 36         | °C   |
-| Extreme Annual Mean Minimum Design Dry Bulb Temperature | array.min_temp               | In Florida: -9 to 11 | -9         | °C   |
-| Maximum Voltage Rating?                                 | array.code_limit_max_voltage | 600                  | 600        | V    |
+| Description                                             | Symbol                          | Limits               | Value used | Unit |
+|:--------------------------------------------------------|:--------------------------------|:---------------------|:-----------|:-----|
+| 2% Maximum Temperature                                  | array.max_temp                  | In Florida: 30 to 36 | 36         | °C   |
+| Extreme Annual Mean Minimum Design Dry Bulb Temperature | array.min_temp                  | In Florida: -9 to 11 | -9         | °C   |
+| Maximum Voltage Rating?                                 | array.code_limit_max_voltage    | 600                  | 600        | V    |
+| Voltage Correction Factor                               | array.voltage_correction_factor |                      | 1.14       |      |
 
-The most extreme temperatures are used so that the designed system is usable anywhere in Florida.
+
+The most extreme temperatures are used so that the designed system is usable anywhere in Florida. 
+Voltage correction factor is taken from Table 690.7.
 
 
 
@@ -111,31 +114,30 @@ Module:
 
 Calculation summary:
 
-| Description                                                               | Symbol                          | Calculation                                                                                          | Unit |
-|:--------------------------------------------------------------------------|:--------------------------------|:-----------------------------------------------------------------------------------------------------|:-----|
-| Maximum Power (W)                                                         | source.max_power                | module.pmp * array.largest_string                                                                    | W    |
-| Open-Circuit Voltage (V)                                                  | source.voc                      | module.voc * array.largest_string                                                                    | V    |
-| Short-Circuit Current (A)                                                 | source.isc                      | module.isc                                                                                           | A    |
-| Maximum Power Voltage (V)                                                 | source.vmp                      | module.vmp * array.largest_string                                                                    | V    |
-| Maximum Power Current (A)                                                 | source.imp                      | module.imp                                                                                           | A    |
-| Source Circuit Maximum Current (A), Isc x 1.25                            | source.Isc_adjusted             | module.isc * 1.25                                                                                    | A    |
-| Voltage Correction Factor                                                 | array.voltage_correction_factor | sf.if( array.min_temp < -5, 1.12, 1.14)                                                              |      |
-| Maximum system voltage Option 1 ( module temp. correction factor )        | array.max_sys_voltage_2         | source.voc * ( 1 + module.tc_voc_percent / 100 * ( array.min_temp - 25))                             | V    |
-| Maximum system voltage Option 1 ( general temp. correction factor)        | array.max_sys_voltage_1         | source.voc * array.voltage_correction_factor                                                         | V    |
-| Maximum system voltage                                                    | array.max_sys_voltage           | sf.max( array.max_sys_voltage_1, array.max_sys_voltage_2 )                                           |      |
-| Minimum array voltage ( module temp. correction factor )                  | array.min_voltage               | array.smallest_string * module.vmp * ( 1 + module.tc_vpmax_percent / 100 * ( array.max_temp - 25 ) ) | V    |
-| Maximum Power (W)                                                         | array.pmp                       | array.num_of_modules * module.pmp                                                                    | W    |
-| Open-Circuit Voltage (V)                                                  | array.voc                       | source.voc                                                                                           | V    |
-| Short-Circuit Current (A)                                                 | array.isc                       | module.isc * array.num_of_strings                                                                    | A    |
-| Maximum Power Voltage (V)                                                 | array.vmp                       | module.vmp * array.largest_string                                                                    | V    |
-| Maximum Power Current (A)                                                 | array.imp                       | module.imp * array.num_of_strings                                                                    | A    |
-| PV Power Source Maximum Current (A)                                       | array.isc_adjusted              | array.isc * 1.25                                                                                     | A    |
-| PV Power Source Maximum Voltage (V)                                       | array.vmp_adjusted              | array.max_sys_voltage_2                                                                              | V    |
-| PV Power Source Minimum Voltage (V)                                       | array.vmp_adjusted_min          | ???                                                                                                  |      |
-| Enter Maximum Number of Parallel Source Circuits per Output Circuit (1-2) | array.circuits_per_MPPT         | Math.ceil( array.num_of_strings / inverter.mppt_channels )                                           |      |
-| PV Output Circuit Maximum Current (A)                                     | array.combined_isc              | source.isc * array.circuits_per_MPPT                                                                 | A    |
-| PV Output Circuit Maximum Current (A), Isc x 1.25                         | array.combined_isc_adjusted     | module.isc * 1.25 * array.circuits_per_MPPT                                                          | A    |
-| Maximum PV Output Circuit Voltage at Lowest Temperature                   | array.max_sys_voltage_2         | array.max_sys_voltage_2                                                                              | V    |
+| Description                                                               | Symbol                      | Calculation                                                                                          | Unit |
+|:--------------------------------------------------------------------------|:----------------------------|:-----------------------------------------------------------------------------------------------------|:-----|
+| Maximum Power (W)                                                         | source.max_power            | module.pmp * array.largest_string                                                                    | W    |
+| Open-Circuit Voltage (V)                                                  | source.voc                  | module.voc * array.largest_string                                                                    | V    |
+| Short-Circuit Current (A)                                                 | source.isc                  | module.isc                                                                                           | A    |
+| Maximum Power Voltage (V)                                                 | source.vmp                  | module.vmp * array.largest_string                                                                    | V    |
+| Maximum Power Current (A)                                                 | source.imp                  | module.imp                                                                                           | A    |
+| Source Circuit Maximum Current (A), Isc x 1.25                            | source.Isc_adjusted         | module.isc * 1.25                                                                                    | A    |
+| Maximum system voltage Option 1 ( module temp. correction factor )        | array.max_sys_voltage_2     | source.voc * ( 1 + module.tc_voc_percent / 100 * ( array.min_temp - 25))                             | V    |
+| Maximum system voltage Option 1 ( general temp. correction factor)        | array.max_sys_voltage_1     | source.voc * array.voltage_correction_factor                                                         | V    |
+| Maximum system voltage                                                    | array.max_sys_voltage       | sf.max( array.max_sys_voltage_1, array.max_sys_voltage_2 )                                           |      |
+| Minimum array voltage ( module temp. correction factor )                  | array.min_voltage           | array.smallest_string * module.vmp * ( 1 + module.tc_vpmax_percent / 100 * ( array.max_temp - 25 ) ) | V    |
+| Maximum Power (W)                                                         | array.pmp                   | array.num_of_modules * module.pmp                                                                    | W    |
+| Open-Circuit Voltage (V)                                                  | array.voc                   | source.voc                                                                                           | V    |
+| Short-Circuit Current (A)                                                 | array.isc                   | module.isc * array.num_of_strings                                                                    | A    |
+| Maximum Power Voltage (V)                                                 | array.vmp                   | module.vmp * array.largest_string                                                                    | V    |
+| Maximum Power Current (A)                                                 | array.imp                   | module.imp * array.num_of_strings                                                                    | A    |
+| PV Power Source Maximum Current (A)                                       | array.isc_adjusted          | array.isc * 1.25                                                                                     | A    |
+| PV Power Source Maximum Voltage (V)                                       | array.vmp_adjusted          | array.max_sys_voltage_2                                                                              | V    |
+| PV Power Source Minimum Voltage (V)                                       | array.vmp_adjusted_min      | ???                                                                                                  |      |
+| Enter Maximum Number of Parallel Source Circuits per Output Circuit (1-2) | array.circuits_per_MPPT     | Math.ceil( array.num_of_strings / inverter.mppt_channels )                                           |      |
+| PV Output Circuit Maximum Current (A)                                     | array.combined_isc          | source.isc * array.circuits_per_MPPT                                                                 | A    |
+| PV Output Circuit Maximum Current (A), Isc x 1.25                         | array.combined_isc_adjusted | module.isc * 1.25 * array.circuits_per_MPPT                                                          | A    |
+| Maximum PV Output Circuit Voltage at Lowest Temperature                   | array.max_sys_voltage_2     | array.max_sys_voltage_2                                                                              | V    |
 
 
 
@@ -180,6 +182,8 @@ For string inverters, this is the circuit names:
 * Exposed source circuit wiring: DC wires exposed on the roof.
 * PV DC source circuits: DC wires in conduit.
 * Inverter ac output circuit: AC circuits between the inverter and panel OCPD.
+
+
 The array temperature adder is found in NEC table 310.15(B)(3)(c), with module.array_offset_from_roof as "Distance Above Roof to Bottom of Conduit (in)".
 The maximum current and voltage for the array DC circuits are equal to source.isc and source.voc. 
 
@@ -266,6 +270,7 @@ At least one of the following checks must not fail:
 * The sum of 125 percent of the inverter(s) output circuit current and the rating of the overcurrent device protecting the busbar exceeded the ampacity of the busbar.               
 * The sum of 125 percent of the inverter(s) output circuit current and the rating of the overcurrent device protecting the busbar exceeded 120 percent of the ampacity of the busbar.
 * The sum of the ampere ratings of all overcurrent devices on panelboards exceeded the ampacity of the busbar.                                                                       
+
 
 
 

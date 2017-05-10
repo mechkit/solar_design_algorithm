@@ -30,13 +30,13 @@ var SDA = function(system_settings){
   array.max_temp = 36;
   array.min_temp = -9;
   array.code_limit_max_voltage = 600;
+  array.voltage_correction_factor = 1.14;
   source.max_power = module.pmp * array.largest_string;
   source.voc = module.voc * array.largest_string;
   source.isc = module.isc;
   source.vmp = module.vmp * array.largest_string;
   source.imp = module.imp;
   source.Isc_adjusted = module.isc * 1.25;
-  array.voltage_correction_factor = sf.if( array.min_temp < -5, 1.12, 1.14);
   array.max_sys_voltage_1 = source.voc * array.voltage_correction_factor;
   array.max_sys_voltage_2 = source.voc * ( 1 + module.tc_voc_percent / 100 * ( array.min_temp - 25));
   array.max_sys_voltage = sf.max( array.max_sys_voltage_1, array.max_sys_voltage_2 );
@@ -73,7 +73,6 @@ var SDA = function(system_settings){
   inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
   inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
   inverter.max_ac_output_current = inverter['max_ac_ouput_current_'+inverter.grid_voltage];
-  
   
   var circuit_names = [
     'exposed source circuit wiring',
@@ -133,7 +132,7 @@ var SDA = function(system_settings){
     circuit.OCPD_required = sf.index( [false, false, true ], circuit.id );
     circuit.ocpd_type = sf.index( ['NA', 'PV Fuse', 'Circuit Breaker'], circuit.id );
     
-    circuit.OCPD = sf.lookup( circuit.min_req_OCPD_current, tables[8], 0, true, true);
+    circuit.OCPD = sf.lookup( circuit.min_req_OCPD_current, tables[9], 0, true, true);
     if( circuit_name === 'inverter ac output circuit' ){ inverter.OCPD = circuit.OCPD; }
     circuit.min_req_cond_current = sf.if( circuit.OCPD_required, circuit.OCPD, circuit.min_req_OCPD_current );
     circuit.conductor_current = sf.lookup( circuit.min_req_cond_current, tables[4], 0, true);
@@ -155,13 +154,13 @@ var SDA = function(system_settings){
         circuit.conductor_size_min = '10';
       }
     }
-    circuit.conductor_current = sf.lookup( circuit.conductor_size_min, tables[9], 1);
-    circuit.conductor_strands = sf.lookup( circuit.conductor_size_min, tables[5], 1 );
-    circuit.conductor_diameter = sf.lookup( circuit.conductor_size_min, tables[5], 2 );
+    circuit.conductor_current = sf.lookup( circuit.conductor_size_min, tables[5], 1);
+    circuit.conductor_strands = sf.lookup( circuit.conductor_size_min, tables[6], 1 );
+    circuit.conductor_diameter = sf.lookup( circuit.conductor_size_min, tables[6], 2 );
     circuit.min_req_conduit_area_40 = circuit.total_conductors * ( 0.25 * PI() * math.pow(circuit.conductor_diameter, 2) );
     
-    circuit.min_conduit_size_PVC_80 = sf.lookup( circuit.min_req_conduit_area_40, tables[6] );
-    circuit.min_conduit_size_EMT = sf.lookup( circuit.min_req_conduit_area_40, tables[7] );
+    circuit.min_conduit_size_PVC_80 = sf.lookup( circuit.min_req_conduit_area_40, tables[7], 1, true );
+    circuit.min_conduit_size_EMT = sf.lookup( circuit.min_req_conduit_area_40, tables[8] );
     circuit.min_conduit_size = circuit.min_conduit_size_PVC_80 || circuit.min_conduit_size_EMT;
     
     circuit.conductor = sf.index( ['DC+/DC-, EGC', 'DC+/DC-, EGC', 'L1/L2, N, EGC'], circuit.id );
