@@ -328,7 +328,7 @@ For strings per MPP tracker of 2 or less, or for inverters with built in OCPD, a
       
 Choose the OCPD that is greater or equal to the minimum required current.
 
-      circuit.OCPD = sf.lookup( circuit.min_req_OCPD_current, tables[8], 0, true, true);
+      circuit.OCPD = sf.lookup( circuit.min_req_OCPD_current, tables[9], 0, true, true);
       if( circuit_name === 'inverter ac output circuit' ){ inverter.OCPD = circuit.OCPD; }
 
 Choose the conductor with a current rating that is greater than the OCPD rating from NEC table 310.15(B)(16). 
@@ -354,15 +354,15 @@ NEC chapter 9 table 8 provides more details on the conductor. For DC circuits, 1
           circuit.conductor_size_min = '10';
         }
       }
-      circuit.conductor_current = sf.lookup( circuit.conductor_size_min, tables[9], 1);
-      circuit.conductor_strands = sf.lookup( circuit.conductor_size_min, tables[5], 1 );
-      circuit.conductor_diameter = sf.lookup( circuit.conductor_size_min, tables[5], 2 );
+      circuit.conductor_current = sf.lookup( circuit.conductor_size_min, tables[5], 1);
+      circuit.conductor_strands = sf.lookup( circuit.conductor_size_min, tables[6], 1 );
+      circuit.conductor_diameter = sf.lookup( circuit.conductor_size_min, tables[6], 2 );
       circuit.min_req_conduit_area_40 = circuit.total_conductors * ( 0.25 * PI() * math.pow(circuit.conductor_diameter, 2) );
       
 The NEC article 352 and 358 tables are used to find a conduit with a sufficent 40% fill rate to hold the total conductor size for all the conductors.
 
-      circuit.min_conduit_size_PVC_80 = sf.lookup( circuit.min_req_conduit_area_40, tables[6] );
-      circuit.min_conduit_size_EMT = sf.lookup( circuit.min_req_conduit_area_40, tables[7] );
+      circuit.min_conduit_size_PVC_80 = sf.lookup( circuit.min_req_conduit_area_40, tables[7], 1, true );
+      circuit.min_conduit_size_EMT = sf.lookup( circuit.min_req_conduit_area_40, tables[8] );
       circuit.min_conduit_size = circuit.min_conduit_size_PVC_80 || circuit.min_conduit_size_EMT;
 
 
