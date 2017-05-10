@@ -169,31 +169,36 @@ Calculation summary:
 
 The maximum array voltage is must not exceed the maximum system voltage allowed by the module.
 
-    error_check['array_test_1'] = array.max_sys_voltage > module.max_system_v;
-    if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the modules max system voltage.' );}
+    error_check.array_test_1 = array.max_sys_voltage > module.max_system_v;
+    // If error check is true, flag system design failure, and report notice to user.
+    if(error_check.array_test_1 ){ report_error( 'Maximum system voltage exceeds the modules max system voltage.' );}
     
 
 The maximum array voltage is must not exceed the maximum system voltage allowed by the building code.
 
-    error_check['array_test_2'] = array.max_sys_voltage > array.code_limit_max_voltage;
-    if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the maximum voltage allows by code.' );}
+    error_check.array_test_2 = array.max_sys_voltage > array.code_limit_max_voltage;
+    // If error check is true, flag system design failure, and report notice to user.
+    if(error_check.array_test_2){ report_error( 'Maximum system voltage exceeds the maximum voltage allows by code.' );}
     
 
 The maximum array voltage must not exceed the maximum system voltage allowed by the inverter.
 
-    error_check['array_test_3'] = array.max_sys_voltage > inverter.vmax;
-    if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the inverter maximum voltage rating' );}
+    error_check.array_test_3 = array.max_sys_voltage > inverter.vmax;
+    // If error check is true, flag system design failure, and report notice to user.
+    if(error_check.array_test_3){ report_error( 'Maximum system voltage exceeds the inverter maximum voltage rating' );}
     
 
 The minimum array voltage must be greater than the inverter minimum operating voltage.
 
-    error_check['array_test_4'] = array.min_voltage < inverter.voltage_range_min;
-    if(error_check[ 'array_test_1' ]){ report_error( 'Minimum Array Vmp is less than the inverter minimum operating voltage.' );}
+    error_check.array_test_4 = array.min_voltage < inverter.voltage_range_min;
+    // If error check is true, flag system design failure, and report notice to user.
+    if(error_check.array_test_4){ report_error( 'Minimum Array Vmp is less than the inverter minimum operating voltage.' );}
     
 
 The total array power must be less than 10,000W.
 
     error_check.power_check_array = array.pmp > 10000;
+    // If error check is true, flag system design failure, and report notice to user.
     if( error_check.power_check_array ){ report_error( 'Array voltage exceeds 10kW' );}
     
 
@@ -202,6 +207,7 @@ The combined current is the total current per MPP tracker input.
 A correction factor of 1.25 is applied to the STC module Isc to account for high irradiance conditions.
 
     error_check.current_check_inverter = ( array.combined_isc * 1.25 ) > inverter.isc_channel;
+    // If error check is true, flag system design failure, and report notice to user.
     if( error_check.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' );}
 
 
@@ -211,24 +217,24 @@ If max_ac_ocpd is not provided by the manufacturer, it is calculated as follows:
 
 AC_OCPD_max = max_ac_output_current * 1.25
 
+    inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
+
 The nominal_ac_output_power is selected from fields based on the user selected grid voltage. As an example, if the user selects 240 VAC, then:
 
 nominal_ac_output_power = nominal_ac_output_power_240
 max_ac_output_current = max_ac_ouput_current_240
 
-    inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
     inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
     inverter.max_ac_output_current = inverter['max_ac_ouput_current_'+inverter.grid_voltage];
     
 
 
-
 ### Conductor and conduit schedule
 
-For string inverters, this is the circuit names:
+For string inverters, these are the circuit names:
 * Exposed source circuit wiring: DC wires exposed on the roof.
 * PV DC source circuits: DC wires in conduit.
-* Inverter ac output circuit: AC circuits between the inverter and panel OCPD.
+* Inverter AC output circuit: AC circuits between the inverter and panel OCPD.
 
 
     var circuit_names = [
@@ -240,8 +246,9 @@ For string inverters, this is the circuit names:
       circuits[circuit_name] = {};
     });
     
-The array temperature adder is found in NEC table 310.15(B)(3)(c), with module.array_offset_from_roof as "Distance Above Roof to Bottom of Conduit (in)".
+The array temperature adder is found in NEC table 310.15(B)(3)(c), or Table 1 in appendix, with module.array_offset_from_roof as "Distance Above Roof to Bottom of Conduit (in)".
     
+    // Use Table 1, lookup: module.array_offset_from_roof, return the first column.
     circuits['exposed source circuit wiring'].temp_adder = sf.lookup( module.array_offset_from_roof, tables[1] );
     
 The maximum current and voltage for the array DC circuits are equal to source.isc and source.voc. 
@@ -301,7 +308,9 @@ For a state wide design, the largest maximum temperature for the state is used.
 Rooftop array circuits also have a temperature adjustment defined above.
       
       circuit.max_conductor_temp = array.max_temp + circuit.temp_adder;
+      // Use Table 2, lookup: circuit.max_conductor_temp, return the first column.
       circuit.temp_correction_factor = sf.lookup( circuit.max_conductor_temp, tables[2] );
+      // Use Table 3, lookup: circuit.total_cc_conductors, return the first column.
       circuit.conductors_adj_factor = sf.lookup( circuit.total_cc_conductors , tables[3] );
 
 There are three options to calculate the minimum required current:
@@ -328,6 +337,7 @@ For strings per MPP tracker of 2 or less, or for inverters with built in OCPD, a
       
 Choose the OCPD that is greater or equal to the minimum required current.
 
+      // Use Table 9, lookup: circuit.min_req_OCPD_current, finst the next highest or matching value, return the index column.
       circuit.OCPD = sf.lookup( circuit.min_req_OCPD_current, tables[9], 0, true, true);
       if( circuit_name === 'inverter ac output circuit' ){ inverter.OCPD = circuit.OCPD; }
 
@@ -335,7 +345,10 @@ Choose the conductor with a current rating that is greater than the OCPD rating 
 NEC chapter 9 table 8 provides more details on the conductor. For DC circuits, 10 AWG wire is used as a best practice. 
 
       circuit.min_req_cond_current = sf.if( circuit.OCPD_required, circuit.OCPD, circuit.min_req_OCPD_current );
+      
+      // Use Table 4, lookup: circuit.min_req_cond_current, find the next highest value, return the index column.
       circuit.conductor_current = sf.lookup( circuit.min_req_cond_current, tables[4], 0, true);
+      // Use Table 4, lookup: circuit.conductor_current, return the first column.
       circuit.conductor_size_min = sf.lookup( circuit.conductor_current, tables[4] );
       if( circuit_name === 'exposed source circuit wiring' ){ 
         circuit.conductor_size_min = '10'; 
@@ -354,15 +367,20 @@ NEC chapter 9 table 8 provides more details on the conductor. For DC circuits, 1
           circuit.conductor_size_min = '10';
         }
       }
+      // Use Table 5, lookup: circuit.conductor_size_min, return the first column.
       circuit.conductor_current = sf.lookup( circuit.conductor_size_min, tables[5], 1);
+      // Use Table 6, lookup: circuit.conductor_size_min, return the first column.
       circuit.conductor_strands = sf.lookup( circuit.conductor_size_min, tables[6], 1 );
+      // Use Table 6, lookup: circuit.conductor_size_min, return the second column.
       circuit.conductor_diameter = sf.lookup( circuit.conductor_size_min, tables[6], 2 );
       circuit.min_req_conduit_area_40 = circuit.total_conductors * ( 0.25 * PI() * math.pow(circuit.conductor_diameter, 2) );
       
 The NEC article 352 and 358 tables are used to find a conduit with a sufficent 40% fill rate to hold the total conductor size for all the conductors.
 
+      // Use Table 7, lookup: circuit.min_req_conduit_area_40, find the next highest value, return the first column.
       circuit.min_conduit_size_PVC_80 = sf.lookup( circuit.min_req_conduit_area_40, tables[7], 1, true );
-      circuit.min_conduit_size_EMT = sf.lookup( circuit.min_req_conduit_area_40, tables[8] );
+      // Use Table 8, lookup: circuit.min_req_conduit_area_40, find the next highest value, return the first column.
+      circuit.min_conduit_size_EMT = sf.lookup( circuit.min_req_conduit_area_40, tables[8], 1, true );
       circuit.min_conduit_size = circuit.min_conduit_size_PVC_80 || circuit.min_conduit_size_EMT;
 
 
@@ -435,10 +453,12 @@ At least one of the following checks must not fail:
     interconnection.check_3 = ( interconnection.inverter_ocpd_dev_sum + interconnection.load_breaker_total ) > interconnection.bussbar_rating;
     
     error_check.interconnection_bus_pass = sf.and( interconnection.check_1, interconnection.check_2, interconnection.check_3 );
+    // If error check is true, flag system design failure, and report notice to user.
     if( error_check.interconnection_bus_pass ){ report_error( 'The busbar is not compliant.' );}
     
 
 The panel's main OCPD must not exceed the bussbar rating.
 
     error_check.interconnection_check_4 = interconnection.supply_ocpd_rating > interconnection.bussbar_rating;
+    // If error check is true, flag system design failure, and report notice to user.
     if( error_check.interconnection_check_4 ){ report_error( 'The rating of the overcurrent device protecting the busbar exceeds the rating of the busbar. ' );}
