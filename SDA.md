@@ -44,7 +44,7 @@ These are fixed values that are not calculated or provided by the user.
 | Voltage Correction Factor                               | array.voltage_correction_factor |                      | 1.14       |      |
 
 
-The most extreme temperatures are used so that the designed system is usable anywhere in Florida. 
+The [most extreme temperatures](http://www.solarabcs.org/about/publications/reports/expedited-permit/map/index.html) are used so that the designed system is usable anywhere in Florida. 
 Voltage correction factor is taken from Table 690.7.
 
     array.max_temp = 36;
