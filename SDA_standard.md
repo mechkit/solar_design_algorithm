@@ -44,7 +44,7 @@ These are fixed values that are not calculated or provided by the user.
 | Voltage Correction Factor                               | array.voltage_correction_factor |                      | 1.14       |      |
 
 
-The most extreme temperatures are used so that the designed system is usable anywhere in Florida. 
+The [most extreme temperatures](http://www.solarabcs.org/about/publications/reports/expedited-permit/map/index.html) are used so that the designed system is usable anywhere in Florida. 
 Voltage correction factor is taken from Table 690.7.
 
 
@@ -168,6 +168,7 @@ If max_ac_ocpd is not provided by the manufacturer, it is calculated as follows:
 
 AC_OCPD_max = max_ac_output_current * 1.25
 
+
 The nominal_ac_output_power is selected from fields based on the user selected grid voltage. As an example, if the user selects 240 VAC, then:
 
 nominal_ac_output_power = nominal_ac_output_power_240
@@ -175,16 +176,15 @@ max_ac_output_current = max_ac_ouput_current_240
 
 
 
-
 ### Conductor and conduit schedule
 
-For string inverters, this is the circuit names:
+For string inverters, these are the circuit names:
 * Exposed source circuit wiring: DC wires exposed on the roof.
 * PV DC source circuits: DC wires in conduit.
-* Inverter ac output circuit: AC circuits between the inverter and panel OCPD.
+* Inverter AC output circuit: AC circuits between the inverter and panel OCPD.
 
 
-The array temperature adder is found in NEC table 310.15(B)(3)(c), with module.array_offset_from_roof as "Distance Above Roof to Bottom of Conduit (in)".
+The array temperature adder is found in NEC table 310.15(B)(3)(c), or Table 1 in appendix, with module.array_offset_from_roof as "Distance Above Roof to Bottom of Conduit (in)".
 The maximum current and voltage for the array DC circuits are equal to source.isc and source.voc. 
 
 

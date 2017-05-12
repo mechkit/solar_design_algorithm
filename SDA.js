@@ -53,22 +53,28 @@ var SDA = function(system_settings){
   array.combined_isc_adjusted = module.isc * 1.25 * array.circuits_per_MPPT;
   array.max_sys_voltage_2 = array.max_sys_voltage_2;
   
-  error_check['array_test_1'] = array.max_sys_voltage > module.max_system_v;
-  if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the modules max system voltage.' );}
+  error_check.array_test_1 = array.max_sys_voltage > module.max_system_v;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.array_test_1 ){ report_error( 'Maximum system voltage exceeds the modules max system voltage.' );}
   
-  error_check['array_test_2'] = array.max_sys_voltage > array.code_limit_max_voltage;
-  if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the maximum voltage allows by code.' );}
+  error_check.array_test_2 = array.max_sys_voltage > array.code_limit_max_voltage;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.array_test_2){ report_error( 'Maximum system voltage exceeds the maximum voltage allows by code.' );}
   
-  error_check['array_test_3'] = array.max_sys_voltage > inverter.vmax;
-  if(error_check[ 'array_test_1' ]){ report_error( 'Maximum system voltage exceeds the inverter maximum voltage rating' );}
+  error_check.array_test_3 = array.max_sys_voltage > inverter.vmax;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.array_test_3){ report_error( 'Maximum system voltage exceeds the inverter maximum voltage rating' );}
   
-  error_check['array_test_4'] = array.min_voltage < inverter.voltage_range_min;
-  if(error_check[ 'array_test_1' ]){ report_error( 'Minimum Array Vmp is less than the inverter minimum operating voltage.' );}
+  error_check.array_test_4 = array.min_voltage < inverter.voltage_range_min;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.array_test_4){ report_error( 'Minimum Array Vmp is less than the inverter minimum operating voltage.' );}
   
   error_check.power_check_array = array.pmp > 10000;
+  // If error check is true, flag system design failure, and report notice to user.
   if( error_check.power_check_array ){ report_error( 'Array voltage exceeds 10kW' );}
   
   error_check.current_check_inverter = ( array.combined_isc * 1.25 ) > inverter.isc_channel;
+  // If error check is true, flag system design failure, and report notice to user.
   if( error_check.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' );}
   inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
   inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
@@ -84,6 +90,7 @@ var SDA = function(system_settings){
   });
   
   
+  // Use Table 1, lookup: module.array_offset_from_roof, return the first column.
   circuits['exposed source circuit wiring'].temp_adder = sf.lookup( module.array_offset_from_roof, tables[1] );
   
   circuits['exposed source circuit wiring'].max_current = array.combined_isc;
@@ -121,7 +128,9 @@ var SDA = function(system_settings){
     
     
     circuit.max_conductor_temp = array.max_temp + circuit.temp_adder;
+    // Use Table 2, lookup: circuit.max_conductor_temp, return the first column.
     circuit.temp_correction_factor = sf.lookup( circuit.max_conductor_temp, tables[2] );
+    // Use Table 3, lookup: circuit.total_cc_conductors, return the first column.
     circuit.conductors_adj_factor = sf.lookup( circuit.total_cc_conductors , tables[3] );
     circuit.min_req_cond_current_1 = circuit.max_current * 1.25;
     circuit.min_req_cond_current_2 = circuit.max_current / ( circuit.temp_correction_factor * circuit.conductors_adj_factor );
@@ -132,10 +141,14 @@ var SDA = function(system_settings){
     circuit.OCPD_required = sf.index( [false, false, true ], circuit.id );
     circuit.ocpd_type = sf.index( ['NA', 'PV Fuse', 'Circuit Breaker'], circuit.id );
     
+    // Use Table 9, lookup: circuit.min_req_OCPD_current, finst the next highest or matching value, return the index column.
     circuit.OCPD = sf.lookup( circuit.min_req_OCPD_current, tables[9], 0, true, true);
     if( circuit_name === 'inverter ac output circuit' ){ inverter.OCPD = circuit.OCPD; }
     circuit.min_req_cond_current = sf.if( circuit.OCPD_required, circuit.OCPD, circuit.min_req_OCPD_current );
+    
+    // Use Table 4, lookup: circuit.min_req_cond_current, find the next highest value, return the index column.
     circuit.conductor_current = sf.lookup( circuit.min_req_cond_current, tables[4], 0, true);
+    // Use Table 4, lookup: circuit.conductor_current, return the first column.
     circuit.conductor_size_min = sf.lookup( circuit.conductor_current, tables[4] );
     if( circuit_name === 'exposed source circuit wiring' ){ 
       circuit.conductor_size_min = '10'; 
@@ -154,13 +167,18 @@ var SDA = function(system_settings){
         circuit.conductor_size_min = '10';
       }
     }
+    // Use Table 5, lookup: circuit.conductor_size_min, return the first column.
     circuit.conductor_current = sf.lookup( circuit.conductor_size_min, tables[5], 1);
+    // Use Table 6, lookup: circuit.conductor_size_min, return the first column.
     circuit.conductor_strands = sf.lookup( circuit.conductor_size_min, tables[6], 1 );
+    // Use Table 6, lookup: circuit.conductor_size_min, return the second column.
     circuit.conductor_diameter = sf.lookup( circuit.conductor_size_min, tables[6], 2 );
     circuit.min_req_conduit_area_40 = circuit.total_conductors * ( 0.25 * PI() * math.pow(circuit.conductor_diameter, 2) );
     
+    // Use Table 7, lookup: circuit.min_req_conduit_area_40, find the next highest value, return the first column.
     circuit.min_conduit_size_PVC_80 = sf.lookup( circuit.min_req_conduit_area_40, tables[7], 1, true );
-    circuit.min_conduit_size_EMT = sf.lookup( circuit.min_req_conduit_area_40, tables[8] );
+    // Use Table 8, lookup: circuit.min_req_conduit_area_40, find the next highest value, return the first column.
+    circuit.min_conduit_size_EMT = sf.lookup( circuit.min_req_conduit_area_40, tables[8], 1, true );
     circuit.min_conduit_size = circuit.min_conduit_size_PVC_80 || circuit.min_conduit_size_EMT;
     
     circuit.conductor = sf.index( ['DC+/DC-, EGC', 'DC+/DC-, EGC', 'L1/L2, N, EGC'], circuit.id );
@@ -189,9 +207,11 @@ var SDA = function(system_settings){
   interconnection.check_3 = ( interconnection.inverter_ocpd_dev_sum + interconnection.load_breaker_total ) > interconnection.bussbar_rating;
   
   error_check.interconnection_bus_pass = sf.and( interconnection.check_1, interconnection.check_2, interconnection.check_3 );
+  // If error check is true, flag system design failure, and report notice to user.
   if( error_check.interconnection_bus_pass ){ report_error( 'The busbar is not compliant.' );}
   
   error_check.interconnection_check_4 = interconnection.supply_ocpd_rating > interconnection.bussbar_rating;
+  // If error check is true, flag system design failure, and report notice to user.
   if( error_check.interconnection_check_4 ){ report_error( 'The rating of the overcurrent device protecting the busbar exceeds the rating of the busbar. ' );}
 
   ///////////////////////////////////////////////
