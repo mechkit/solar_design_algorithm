@@ -10,7 +10,7 @@ The secondary documents are automatically created from this source:
 
 Note: For each section, the symbols are pre-pended by a section name to assist with their use in the computer code, in the form of "section.symbol".
 
-## String Inverter System Calculations
+## Micro Inverter System Calculations
 
 ### Modules, source circuits, and array
 
