@@ -14,74 +14,96 @@ Note: For each section, the symbols are pre-pended by a section name to assist w
 
 ### Modules, source circuits, and array
 
+Determine if the microinverter will connect to one or more modules.
+
+The largest number of microinverters per branch must not exceed the maximum number allowed by the manufacturer.
+
+  error_check.micro_branch = array.largest_string > inverter.max_per_branch;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.micro_branch ){ report_error( 'System has two many inverters per branch circuit.' );}
+
+The module(s) power must be less than the inverter's maximum power.
+
+    var power_ratio = inverter.max_dc_inputpower / module.pmp;
+    // if < 1, fail
+    // if > 2, multiple modules per inverter possible.
+    error_check.module_inverter_1 = power_ratio < 1;
+    // If error check is true, flag system design failure, and report notice to user.
+    if(error_check.module_inverter_1 ){ report_error( '???' );}
+
+The module(s) operating voltage must be greater than the inverter minimum operating voltage. 
+
+    error_check.module_inverter_2 = module.vmp < inverter.mppt_min;
+    // If error check is true, flag system design failure, and report notice to user.
+    if(error_check.module_inverter_2 ){ report_error( '??? module.vmp < inverter.mppt_min;' );}
+    error_check.module_inverter_3 = module.voc < inverter.vmax;
+    // If error check is true, flag system design failure, and report notice to user.
+    if(error_check.array_test_3 ){ report_error( '??? module.voc < inverter.vmax' );}
+
+The module(s) operating voltage must be less than the inverter maximum operating voltage. 
+    
+    var max_voltage_ratio = inverter.mppt_max / module.vmp;
+    // if < 1, fail
+    // if > 2, multiple modules per inverter possible.
+    error_check.module_inverter_4 = power_ratio < 1;
+    // If error check is true, flag system design failure, and report notice to user.
+    if(error_check.array_test_4 ){ report_error( '???' );}
+
+The module current must be less than the inverter's maximum current.
+
+    error_check.module_inverter_5 = module.ipm > inverter.imax_channel;
+    // If error check is true, flag system design failure, and report notice to user.
+    if(error_check.array_test_5 ){ report_error( '???' );}
+    error_check.module_inverter_6 = module.isc > inverter.isc_channel;
+    // If error check is true, flag system design failure, and report notice to user.
+    if(error_check.array_test_6 ){ report_error( '???' );}
+
+
+
+
 Calculation summary:
 
-| Description                                                               | Symbol                      | Calculation                                                                                          | Unit |
-|:--------------------------------------------------------------------------|:----------------------------|:-----------------------------------------------------------------------------------------------------|:-----|
-| Maximum Power (W)                                                         | source.max_power            | module.pmp * array.largest_string                                                                    | W    |
-| Open-Circuit Voltage (V)                                                  | source.voc                  | module.voc * array.largest_string                                                                    | V    |
-| Short-Circuit Current (A)                                                 | source.isc                  | module.isc                                                                                           | A    |
-| Maximum Power Voltage (V)                                                 | source.vmp                  | module.vmp * array.largest_string                                                                    | V    |
-| Maximum Power Current (A)                                                 | source.imp                  | module.imp                                                                                           | A    |
-| Source Circuit Maximum Current (A), Isc x 1.25                            | source.Isc_adjusted         | module.isc * 1.25                                                                                    | A    |
-| Maximum system voltage Option 1 ( module temp. correction factor )        | array.max_sys_voltage_2     | source.voc * ( 1 + module.tc_voc_percent / 100 * ( array.min_temp - 25))                             | V    |
-| Maximum system voltage Option 1 ( general temp. correction factor)        | array.max_sys_voltage_1     | source.voc * array.voltage_correction_factor                                                         | V    |
-| Maximum system voltage                                                    | array.max_sys_voltage       | sf.max( array.max_sys_voltage_1, array.max_sys_voltage_2 )                                           |      |
-| Minimum array voltage ( module temp. correction factor )                  | array.min_voltage           | array.smallest_string * module.vmp * ( 1 + module.tc_vpmax_percent / 100 * ( array.max_temp - 25 ) ) | V    |
-| Maximum Power (W)                                                         | array.pmp                   | array.num_of_modules * module.pmp                                                                    | W    |
-| Open-Circuit Voltage (V)                                                  | array.voc                   | source.voc                                                                                           | V    |
-| Short-Circuit Current (A)                                                 | array.isc                   | module.isc * array.num_of_strings                                                                    | A    |
-| Maximum Power Voltage (V)                                                 | array.vmp                   | module.vmp * array.largest_string                                                                    | V    |
-| Maximum Power Current (A)                                                 | array.imp                   | module.imp * array.num_of_strings                                                                    | A    |
-| PV Power Source Maximum Current (A)                                       | array.isc_adjusted          | array.isc * 1.25                                                                                     | A    |
-| PV Power Source Maximum Voltage (V)                                       | array.vmp_adjusted          | array.max_sys_voltage_2                                                                              | V    |
-| PV Power Source Minimum Voltage (V)                                       | array.vmp_adjusted_min      | ???                                                                                                  |      |
-| Enter Maximum Number of Parallel Source Circuits per Output Circuit (1-2) | array.circuits_per_MPPT     | Math.ceil( array.num_of_strings / inverter.mppt_channels )                                           |      |
-| PV Output Circuit Maximum Current (A)                                     | array.combined_isc          | source.isc * array.circuits_per_MPPT                                                                 | A    |
-| PV Output Circuit Maximum Current (A), Isc x 1.25                         | array.combined_isc_adjusted | module.isc * 1.25 * array.circuits_per_MPPT                                                          | A    |
-| Maximum PV Output Circuit Voltage at Lowest Temperature                   | array.max_sys_voltage_2     | array.max_sys_voltage_2                                                                              | V    |
+| Description                                                               | Symbol                  | Calculation                                                | Unit |
+|:--------------------------------------------------------------------------|:------------------------|:-----------------------------------------------------------|:-----|
+| Maximum Power (W)                                                         | array.pmp               | array.num_of_modules * module.pmp                          | W    |
+| Enter Maximum Number of Parallel Source Circuits per Output Circuit (1-2) | array.modules_per_MPPT  |                                                            | -    |
+| Maximum Power (W)                                                         | source.max_power        | module.pmp * array.largest_string                          | W    |
+| Open-Circuit Voltage (V)                                                  | source.voc              | module.voc * array.largest_string                          | V    |
+| Short-Circuit Current (A)                                                 | source.isc              | module.isc                                                 | A    |
+| Maximum Power Voltage (V)                                                 | source.vmp              | module.vmp * array.largest_string                          | V    |
+| Maximum Power Current (A)                                                 | source.imp              | module.imp                                                 | A    |
+| Source Circuit Maximum Current (A), Isc x 1.25                            | source.Isc_adjusted     | module.isc * 1.25                                          | A    |
+| Number of microinverters per branch circuits (maximum)                    | branch.num_of_inverters | Math.ceil( array.largest_string / array.modules_per_MPPT ) | -    |
+| Maximum current per branch circuit                                        | branch.current          | branch.num_of_inverters * inverter.nominal_ac_output_power | A    |
 
-
+    array.pmp = array.num_of_modules * module.pmp;
+    array.modules_per_MPPT = NaN;
     source.max_power = module.pmp * array.largest_string;
     source.voc = module.voc * array.largest_string;
     source.isc = module.isc;
     source.vmp = module.vmp * array.largest_string;
     source.imp = module.imp;
     source.Isc_adjusted = module.isc * 1.25;
-    array.max_sys_voltage_1 = source.voc * array.voltage_correction_factor;
-    array.max_sys_voltage_2 = source.voc * ( 1 + module.tc_voc_percent / 100 * ( array.min_temp - 25));
-    array.max_sys_voltage = sf.max( array.max_sys_voltage_1, array.max_sys_voltage_2 );
-    array.min_voltage = array.smallest_string * module.vmp * ( 1 + module.tc_vpmax_percent / 100 * ( array.max_temp - 25 ) );
-    array.pmp = array.num_of_modules * module.pmp;
-    array.voc = source.voc;
-    array.isc = module.isc * array.num_of_strings;
-    array.vmp = module.vmp * array.largest_string;
-    array.imp = module.imp * array.num_of_strings;
-    array.isc_adjusted = array.isc * 1.25;
-    array.vmp_adjusted = array.max_sys_voltage_2;
-    array.circuits_per_MPPT = Math.ceil( array.num_of_strings / inverter.mppt_channels );
-    array.combined_isc = source.isc * array.circuits_per_MPPT;
-    array.combined_isc_adjusted = module.isc * 1.25 * array.circuits_per_MPPT;
-    array.max_sys_voltage_2 = array.max_sys_voltage_2;
-    
+    branch.num_of_inverters = Math.ceil( array.largest_string / array.modules_per_MPPT );
+    branch.current = branch.num_of_inverters * inverter.nominal_ac_output_power;
 
 The maximum array voltage is must not exceed the maximum system voltage allowed by the module.
 
-    error_check.array_test_1 = array.max_sys_voltage > module.max_system_v;
+    error_check.array_test_1 = source.voc > module.max_system_v;
     // If error check is true, flag system design failure, and report notice to user.
     if(error_check.array_test_1 ){ report_error( 'Maximum system voltage exceeds the modules max system voltage.' );}
     
 
 The maximum array voltage is must not exceed the maximum system voltage allowed by the building code.
 
-    error_check.array_test_2 = array.max_sys_voltage > array.code_limit_max_voltage;
+    error_check.array_test_2 = source.voc > array.code_limit_max_voltage;
     // If error check is true, flag system design failure, and report notice to user.
     if(error_check.array_test_2){ report_error( 'Maximum system voltage exceeds the maximum voltage allows by code.' );}
     
 
 The maximum array voltage must not exceed the maximum system voltage allowed by the inverter.
 
-    error_check.array_test_3 = array.max_sys_voltage > inverter.vmax;
+    error_check.array_test_3 = source.voc > inverter.vmax;
     // If error check is true, flag system design failure, and report notice to user.
     if(error_check.array_test_3){ report_error( 'Maximum system voltage exceeds the inverter maximum voltage rating' );}
     
@@ -104,7 +126,7 @@ The combined DC short circuit current from the array must be less than the maxim
 The combined current is the total current per MPP tracker input. 
 A correction factor of 1.25 is applied to the STC module Isc to account for high irradiance conditions.
 
-    error_check.current_check_inverter = ( array.combined_isc * 1.25 ) > inverter.isc_channel;
+    error_check.current_check_inverter = ( source.isc * 1.25 ) > inverter.isc_channel;
     // If error check is true, flag system design failure, and report notice to user.
     if( error_check.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' );}
 

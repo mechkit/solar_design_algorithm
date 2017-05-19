@@ -65,7 +65,8 @@ Inverter:
 |:-------------------------------------------------------------------|:-------------------------------------|:-----|
 | UL1741 listed/FSEC approved?                                       | inverter.ul_1741                     | -    |
 | Is inverter tranformerless                                         | inverter.tranformerless              | -    |
-| Is this a microinverter                                            | ?                                    | V    |
+| Inverter type (string, micro, DC-DC)                               | inverter.type ???                    | -    |
+| Maximum inverters per branch                                       | inverter.max_per_branch ???          | -    |
 | Maximum dc voltage, Vmax,inv (V)                                   | inverter.vmax                        | V    |
 | MPPT minimum dc operating voltage (V)                              | inverter.mppt_min                    | V    |
 | MPPT maximum operating voltage (V)                                 | inverter.mppt_max                    | V    |
@@ -73,8 +74,8 @@ Inverter:
 | Min. dc start voltage (V)                                          | inverter.vstart                      | V    |
 | Number of inverter inputs or MPP trackers                          | inverter.mppt_channels               | A    |
 | Maximum OCPD Rating (A)                                            | inverter.max_ac_ocpd                 | A    |
-| Maximum DC short circuit current per inverter input or MPP tracker | inverter.isc_channel                 |      |
-| Maximum DC operating current per inverter input or MPP tracker     | inverter.imax_channel                |      |
+| Maximum DC short circuit current per inverter input or MPP tracker | inverter.isc_channel                 | A    |
+| Maximum DC operating current per inverter input or MPP tracker     | inverter.imax_channel                | A    |
 | Max DC input power 120                                             | inverter.max_dc_inputpower_120       | W    |
 | Max DC input power 208                                             | inverter.max_dc_inputpower_208       | W    |
 | Max DC input power 240                                             | inverter.max_dc_inputpower_240       | W    |
