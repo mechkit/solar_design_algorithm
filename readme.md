@@ -8,12 +8,17 @@ These documents are being developed to serve as a Standard released by the Flori
 
 The source documents are text files that are used to create printable PDFs, and also directly generate the core of the computer code used in FSEC's online express drawing creation application.
 
-View the [source files](standard/)
+View the [source files](standard/source)
+
+  * SDA: Constants, user input, and component information
+  * SDA_string: String inverter specific calculations
+  * SDA_micro: Microinverter specific calculations
+  * tables: Reference tables
 
 The secondary documents automatically created from the source:
 
   * [A printable PDF documents describing the algorithm, with and without computer code](standard/documents/).
-  * [Key computer code used in FSEC's online express drawing creation application](standard/code).
+  * [Key computer code used in FSEC's online express drawing creation application](standard/code/).
 
 ## Contributing to the Standard
 
