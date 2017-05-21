@@ -152,9 +152,9 @@ max_ac_output_current = max_ac_ouput_current_240
 ### Conductor and conduit schedule
 
 For string inverters, these are the circuit names:
-* Exposed source circuit wiring: DC wires exposed on the roof.
-* PV DC source circuits: DC wires in conduit.
-* Inverter AC output circuit: AC circuits between the inverter and panel OCPD.
+* Exposed source circuit wiring: microinverter cables exposed on the roof.
+* Inverter AC output circuit: AC branch circuits.
+* Inverter AC output combined circuit: AC circuits between the combiner, if used, and panel OCPD.
 
 
     var circuit_names = [
