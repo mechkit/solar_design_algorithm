@@ -76,21 +76,23 @@ Inverter:
 | Maximum OCPD Rating (A)                                            | inverter.max_ac_ocpd                 | A    |
 | Maximum DC short circuit current per inverter input or MPP tracker | inverter.isc_channel                 | A    |
 | Maximum DC operating current per inverter input or MPP tracker     | inverter.imax_channel                | A    |
-| Max DC input power 120                                             | inverter.max_dc_inputpower_120       | W    |
-| Max DC input power 208                                             | inverter.max_dc_inputpower_208       | W    |
-| Max DC input power 240                                             | inverter.max_dc_inputpower_240       | W    |
-| Max DC input power 277                                             | inverter.max_dc_inputpower_277       | W    |
-| Max DC input power 480                                             | inverter.max_dc_inputpower_480       | W    |
+| Maximum DC input power 120                                         | inverter.max_dc_inputpower_120       | W    |
+| Maximum DC input power 208                                         | inverter.max_dc_inputpower_208       | W    |
+| Maximum DC input power 240                                         | inverter.max_dc_inputpower_240       | W    |
+| Maximum DC input power 277                                         | inverter.max_dc_inputpower_277       | W    |
+| Maximum DC input power 480                                         | inverter.max_dc_inputpower_480       | W    |
 | Nominal AC output power 120                                        | inverter.nominal_ac_output_power_120 | W    |
 | Nominal AC output power 208                                        | inverter.nominal_ac_output_power_208 | W    |
 | Nominal AC output power 240                                        | inverter.nominal_ac_output_power_240 | W    |
 | Nominal AC output power 277                                        | inverter.nominal_ac_output_power_277 | W    |
 | Nominal AC output power 480                                        | inverter.nominal_ac_output_power_480 | W    |
-| Max AC output current 120                                          | inverter.max_ac_output_current_120   | V    |
-| Max AC output current 208                                          | inverter.max_ac_output_current_208   | V    |
-| Max AC output current 240                                          | inverter.max_ac_output_current_240   | V    |
-| Max AC output current 277                                          | inverter.max_ac_output_current_277   | V    |
-| Max AC output current 480                                          | inverter.max_ac_output_current_480   | V    |
+| Maximum AC output current 120                                      | inverter.max_ac_output_current_120   | V    |
+| Maximum AC output current 208                                      | inverter.max_ac_output_current_208   | V    |
+| Maximum AC output current 240                                      | inverter.max_ac_output_current_240   | V    |
+| Maximum AC output current 277                                      | inverter.max_ac_output_current_277   | V    |
+| Maximum AC output current 480                                      | inverter.max_ac_output_current_480   | V    |
+| Maximum units per branch                                           | inverter.max_unitsperbranch          | -    |
+| Minimum units per branch                                           | inverter.min_unitsperbranch          | -    |
 
 
 Module:
