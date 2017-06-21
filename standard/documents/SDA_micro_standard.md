@@ -12,55 +12,47 @@ Note: For each section, the symbols are pre-pended by a section name to assist w
 
 ## Micro Inverter System Calculations
 
-### Modules, source circuits, and array
+### Calculations
 
-Calculation summary:
-
-| Description                                                               | Symbol                      | Calculation                                                                                          | Unit |
-|:--------------------------------------------------------------------------|:----------------------------|:-----------------------------------------------------------------------------------------------------|:-----|
-| Maximum Power (W)                                                         | source.max_power            | module.pmp * array.largest_string                                                                    | W    |
-| Open-Circuit Voltage (V)                                                  | source.voc                  | module.voc * array.largest_string                                                                    | V    |
-| Short-Circuit Current (A)                                                 | source.isc                  | module.isc                                                                                           | A    |
-| Maximum Power Voltage (V)                                                 | source.vmp                  | module.vmp * array.largest_string                                                                    | V    |
-| Maximum Power Current (A)                                                 | source.imp                  | module.imp                                                                                           | A    |
-| Source Circuit Maximum Current (A), Isc x 1.25                            | source.Isc_adjusted         | module.isc * 1.25                                                                                    | A    |
-| Maximum system voltage Option 1 ( module temp. correction factor )        | array.max_sys_voltage_2     | source.voc * ( 1 + module.tc_voc_percent / 100 * ( array.min_temp - 25))                             | V    |
-| Maximum system voltage Option 1 ( general temp. correction factor)        | array.max_sys_voltage_1     | source.voc * array.voltage_correction_factor                                                         | V    |
-| Maximum system voltage                                                    | array.max_sys_voltage       | sf.max( array.max_sys_voltage_1, array.max_sys_voltage_2 )                                           |      |
-| Minimum array voltage ( module temp. correction factor )                  | array.min_voltage           | array.smallest_string * module.vmp * ( 1 + module.tc_vpmax_percent / 100 * ( array.max_temp - 25 ) ) | V    |
-| Maximum Power (W)                                                         | array.pmp                   | array.num_of_modules * module.pmp                                                                    | W    |
-| Open-Circuit Voltage (V)                                                  | array.voc                   | source.voc                                                                                           | V    |
-| Short-Circuit Current (A)                                                 | array.isc                   | module.isc * array.num_of_strings                                                                    | A    |
-| Maximum Power Voltage (V)                                                 | array.vmp                   | module.vmp * array.largest_string                                                                    | V    |
-| Maximum Power Current (A)                                                 | array.imp                   | module.imp * array.num_of_strings                                                                    | A    |
-| PV Power Source Maximum Current (A)                                       | array.isc_adjusted          | array.isc * 1.25                                                                                     | A    |
-| PV Power Source Maximum Voltage (V)                                       | array.vmp_adjusted          | array.max_sys_voltage_2                                                                              | V    |
-| PV Power Source Minimum Voltage (V)                                       | array.vmp_adjusted_min      | ???                                                                                                  |      |
-| Enter Maximum Number of Parallel Source Circuits per Output Circuit (1-2) | array.circuits_per_MPPT     | Math.ceil( array.num_of_strings / inverter.mppt_channels )                                           |      |
-| PV Output Circuit Maximum Current (A)                                     | array.combined_isc          | source.isc * array.circuits_per_MPPT                                                                 | A    |
-| PV Output Circuit Maximum Current (A), Isc x 1.25                         | array.combined_isc_adjusted | module.isc * 1.25 * array.circuits_per_MPPT                                                          | A    |
-| Maximum PV Output Circuit Voltage at Lowest Temperature                   | array.max_sys_voltage_2     | array.max_sys_voltage_2                                                                              | V    |
+| Description                   | Symbol           | Calculation                                                 | Unit |
+|:------------------------------|:-----------------|:------------------------------------------------------------|:-----|
+| Maximum source/branch power   | source.max_power | module.pmp * array.largest_string                           | W    |
+| Maximum source/branch current | source.current   | inverter.max_ac_output_current / 240 * array.largest_string | A    |
+| Maximum array power           | array.pmp        | array.num_of_modules * module.pmp                           | W    |
 
 
 
-The maximum array voltage is must not exceed the maximum system voltage allowed by the module.
-
-
-The maximum array voltage is must not exceed the maximum system voltage allowed by the building code.
-
-
-The maximum array voltage must not exceed the maximum system voltage allowed by the inverter.
-
-
-The minimum array voltage must be greater than the inverter minimum operating voltage.
-
+### Array checks
 
 The total array power must be less than 10,000W.
 
 
-The combined DC short circuit current from the array must be less than the maximum allowed per inverter MPPT channel. 
-The combined current is the total current per MPP tracker input. 
-A correction factor of 1.25 is applied to the STC module Isc to account for high irradiance conditions.
+### Branch checks
+
+The largest number of microinverters per branch must not exceed the maximum number allowed by the manufacturer.
+
+  error_check.micro_branch_too_many_modules = array.largest_string > inverter.max_unitsperbranch;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.micro_branch_too_many_modules ){ report_error( 'The system has too many inverters per branch circuit.' );}
+  
+  error_check.micro_branch_too_few_modules = array.smallest_string < inverter.min_unitsperbranch;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.micro_branch_too_few_modules ){ report_error( 'The system has too many inverters per branch circuit.' );}
+
+The total nominal module power output for each branch must not exceed the manufacturer's limit. 
+
+  error_check.micro_branch_too_much_power = source.max_power > inverter.max_watts_per_branch;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.micro_branch_too_much_power ){ report_error( 'The branch circuit power limit has exceeded the manufacturer's limit.' );}
+
+
+### Module - Inverter checks
+
+The module(s) power must be within the inverter manufacturer's limits.
+
+
+The module's operating voltage must be less than the inverter maximum operating voltage. 
+The selected module can not have more cells than allowed by the inveter manufacturer.
 
 
 
@@ -81,44 +73,27 @@ max_ac_output_current = max_ac_ouput_current_240
 ### Conductor and conduit schedule
 
 For string inverters, these are the circuit names:
-* Exposed source circuit wiring: DC wires exposed on the roof.
-* PV DC source circuits: DC wires in conduit.
-* Inverter AC output circuit: AC circuits between the inverter and panel OCPD.
+* PV Microinverter AC sources
 
-
-The array temperature adder is found in NEC table 310.15(B)(3)(c), or Table 1 in appendix, with module.array_offset_from_roof as "Distance Above Roof to Bottom of Conduit (in)".
+  
 The maximum current and voltage for the array DC circuits are equal to source.isc and source.voc. 
-
-
-The number of DC current carrying conductors is equal to twice the number of strings in the array ( array.num_of_strings * 2 ). 
-Total conductors adds one more for the ground.
 
 
 The AC grid voltage is defined by system specifications (user input).
 
 
-The maximum AC output is defined by the inverter manufacturer specifications.
-
-AC conductors numbers are defined by the grid voltage.
+The number of AC conductors is defined by the conductors required by that AC voltage, multiplied by the number of branches in the array. 
+Total conductors adds one more for the ground.
 
 
 
 For each circuit, calculate the following.
 
-
 The array maximum temperature of the array is equal to the 2% maximum temperature at the install location, or nearest weather station. 
 For a state wide design, the largest maximum temperature for the state is used.
 Rooftop array circuits also have a temperature adjustment defined above.
 
-There are three options to calculate the minimum required current:
-
-  1. circuit.max_current * 1.25;
-  2. circuit.max_current / ( circuit.temp_correction_factor * circuit.conductors_adj_factor );
-  3. circuit.max_current * 1.25 * 1.25;
-
-
-
-For AC circuits, the maximum of 1 and 2 is used. For DC circuits, the maximum of 2 and 3 is used.
+Minimum required current is 1.25 times the cicuit's max current:
 
 
 For strings per MPP tracker of 2 or less, or for inverters with built in OCPD, additional DC OCPD is not required. The AC circuits do require OCPD at the panel.
@@ -129,22 +104,13 @@ Choose the OCPD that is greater or equal to the minimum required current.
 Choose the conductor with a current rating that is greater than the OCPD rating from NEC table 310.15(B)(16). 
 NEC chapter 9 table 8 provides more details on the conductor. For DC circuits, 10 AWG wire is used as a best practice. 
 
-The NEC article 352 and 358 tables are used to find a conduit with a sufficent 40% fill rate to hold the total conductor size for all the conductors.
+The NEC article 352 and 358 tables are used to find a conduit with a sufficient 40% fill rate to hold the total conductor size for all the conductors.
 
 
 
 Select further wire details based on code requirements and best practices.
 
-Exposed source circuit wiring:
-* Conductor: 'DC+/DC-, EGC'
-* Location: 'Free air'
-* Material: 'CU'
-* Type: 'PV Wire, bare'
-* Volt rating: 600
-* Wet temp rating: 90
-* Conduit type: 'NA'
-
-PV DC source circuits:
+PV Microinverter AC sources:
 * Conductor: 'DC+/DC-, EGC'
 * Location: 'Conduit/Exterior'
 * Material: 'CU'
@@ -153,14 +119,6 @@ PV DC source circuits:
 * Wet temp rating: 90
 * Conduit type: 'Metallic'
 
-Inverter ac output circuit:
-* Conductor: 'L1/L2, N, EGC'
-* Location: 'Conduit/Interior'
-* Material: 'CU'
-* Type: 'THWN-2'
-* Volt rating: 600
-* Wet temp rating: 90
-* Conduit type: 'Metallic'
 
 
 

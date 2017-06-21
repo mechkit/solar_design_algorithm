@@ -67,7 +67,7 @@ var SDA = function(system_settings){
   
   error_check.power_check_array = array.pmp > 10000;
   // If error check is true, flag system design failure, and report notice to user.
-  if( error_check.power_check_array ){ report_error( 'Array voltage exceeds 10kW' );}
+  if( error_check.power_check_array ){ report_error( 'Array total power exceeds 10kW' );}
   
   error_check.current_check_inverter = ( array.combined_isc * 1.25 ) > inverter.isc_channel;
   // If error check is true, flag system design failure, and report notice to user.
@@ -137,7 +137,7 @@ var SDA = function(system_settings){
     circuit.OCPD_required = sf.index( [false, false, true ], circuit.id );
     circuit.ocpd_type = sf.index( ['NA', 'PV Fuse', 'Circuit Breaker'], circuit.id );
     
-    // Use Table 9, lookup: circuit.min_req_OCPD_current, finst the next highest or matching value, return the index column.
+    // Use Table 9, lookup: circuit.min_req_OCPD_current, find the next highest or matching value, return the index column.
     circuit.OCPD = sf.lookup( circuit.min_req_OCPD_current, tables[9], 0, true, true);
     if( circuit_name === 'inverter ac output circuit' ){ inverter.OCPD = circuit.OCPD; }
     circuit.min_req_cond_current = sf.if( circuit.OCPD_required, circuit.OCPD, circuit.min_req_OCPD_current );
@@ -175,7 +175,7 @@ var SDA = function(system_settings){
     circuit.min_conduit_size_PVC_80 = sf.lookup( circuit.min_req_conduit_area_40, tables[7], 1, true );
     // Use Table 8, lookup: circuit.min_req_conduit_area_40, find the next highest value, return the first column.
     circuit.min_conduit_size_EMT = sf.lookup( circuit.min_req_conduit_area_40, tables[8], 1, true );
-    circuit.min_conduit_size = circuit.min_conduit_size_PVC_80 || circuit.min_conduit_size_EMT;
+    circuit.min_conduit_size = circuit.min_conduit_size_EMT;
     
     circuit.conductor = sf.index( ['DC+/DC-, EGC', 'DC+/DC-, EGC', 'L1/L2, N, EGC'], circuit.id );
     circuit.location = sf.index( ['Free air', 'Conduit/Exterior', 'Conduit/Interior'], circuit.id );

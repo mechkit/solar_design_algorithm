@@ -30,8 +30,6 @@ These are the what uniquely define the system design. Every other value is deter
 | Main panel busbar rating (A)                                  | interconnection.bussbar_rating     | A    |
 | Total of load breakers (A)                                    | interconnection.load_breaker_total | A    |
 
-
-
 ## Constants
 
 These are fixed values that are not calculated or provided by the user.
@@ -48,7 +46,6 @@ The [most extreme temperatures](http://www.solarabcs.org/about/publications/repo
 Voltage correction factor is taken from Table 690.7.
 
 
-
 ---
 
 ## Manufacturer data
@@ -61,7 +58,8 @@ Inverter:
 |:-------------------------------------------------------------------|:-------------------------------------|:-----|
 | UL1741 listed/FSEC approved?                                       | inverter.ul_1741                     | -    |
 | Is inverter tranformerless                                         | inverter.tranformerless              | -    |
-| Is this a microinverter                                            | ?                                    | V    |
+| Inverter type (string, micro, DC-DC)                               | inverter.type ???                    | -    |
+| Maximum inverters per branch                                       | inverter.max_per_branch ???          | -    |
 | Maximum dc voltage, Vmax,inv (V)                                   | inverter.vmax                        | V    |
 | MPPT minimum dc operating voltage (V)                              | inverter.mppt_min                    | V    |
 | MPPT maximum operating voltage (V)                                 | inverter.mppt_max                    | V    |
@@ -69,38 +67,44 @@ Inverter:
 | Min. dc start voltage (V)                                          | inverter.vstart                      | V    |
 | Number of inverter inputs or MPP trackers                          | inverter.mppt_channels               | A    |
 | Maximum OCPD Rating (A)                                            | inverter.max_ac_ocpd                 | A    |
-| Maximum DC short circuit current per inverter input or MPP tracker | inverter.isc_channel                 |      |
-| Maximum DC operating current per inverter input or MPP tracker     | inverter.imax_channel                |      |
-| Max DC input power 120                                             | inverter.max_dc_inputpower_120       | W    |
-| Max DC input power 208                                             | inverter.max_dc_inputpower_208       | W    |
-| Max DC input power 240                                             | inverter.max_dc_inputpower_240       | W    |
-| Max DC input power 277                                             | inverter.max_dc_inputpower_277       | W    |
-| Max DC input power 480                                             | inverter.max_dc_inputpower_480       | W    |
+| Maximum DC short circuit current per inverter input or MPP tracker | inverter.isc_channel                 | A    |
+| Maximum DC operating current per inverter input or MPP tracker     | inverter.imax_channel                | A    |
+| Maximum DC input power 120                                         | inverter.max_dc_inputpower_120       | W    |
+| Maximum DC input power 208                                         | inverter.max_dc_inputpower_208       | W    |
+| Maximum DC input power 240                                         | inverter.max_dc_inputpower_240       | W    |
+| Maximum DC input power 277                                         | inverter.max_dc_inputpower_277       | W    |
+| Maximum DC input power 480                                         | inverter.max_dc_inputpower_480       | W    |
 | Nominal AC output power 120                                        | inverter.nominal_ac_output_power_120 | W    |
 | Nominal AC output power 208                                        | inverter.nominal_ac_output_power_208 | W    |
 | Nominal AC output power 240                                        | inverter.nominal_ac_output_power_240 | W    |
 | Nominal AC output power 277                                        | inverter.nominal_ac_output_power_277 | W    |
 | Nominal AC output power 480                                        | inverter.nominal_ac_output_power_480 | W    |
-| Max AC output current 120                                          | inverter.max_ac_output_current_120   | V    |
-| Max AC output current 208                                          | inverter.max_ac_output_current_208   | V    |
-| Max AC output current 240                                          | inverter.max_ac_output_current_240   | V    |
-| Max AC output current 277                                          | inverter.max_ac_output_current_277   | V    |
-| Max AC output current 480                                          | inverter.max_ac_output_current_480   | V    |
-
+| Maximum AC output current 120                                      | inverter.max_ac_output_current_120   | V    |
+| Maximum AC output current 208                                      | inverter.max_ac_output_current_208   | V    |
+| Maximum AC output current 240                                      | inverter.max_ac_output_current_240   | V    |
+| Maximum AC output current 277                                      | inverter.max_ac_output_current_277   | V    |
+| Maximum AC output current 480                                      | inverter.max_ac_output_current_480   | V    |
+| Maximum units per branch                                           | inverter.max_unitsperbranch          | -    |
+| Minimum units per branch                                           | inverter.min_unitsperbranch          | -    |
+| Minimum panel wattage                                              | inverter.min_panel_wattage           | W    |
+| Maximum panel wattage                                              | inverter.max_panel_wattage           | W    |
+| Maximum number of cells per panel                                  | inverter.max_module_cells            | -    |
+| Maximum watts per string                                           | inverter.max_watts_per_branch        | -    |
 
 Module:
 
-| Description                           | Symbol                  | Unit |
-|:--------------------------------------|:------------------------|:-----|
-| Description                           | Symbol                  | Unit |
-| FSEC certified                        | module.FSEC_approved    | -    |
-| Maximum power @ STC (W)               | module.pmp              | W    |
-| Open-circuit voltage @ STC (V)        | module.voc              | V    |
-| Short-circuit current @ STC (A)       | module.isc              | A    |
-| Maximum power voltage @ STC (V)       | module.vmp              | V    |
-| Maximum power current @ STC (A)       | module.imp              | A    |
-| Maximum overcurrent device rating (A) | module.max_series_fuse  | A    |
-| Maximum system voltage rating (V)     | module.max_system_v     | V    |
-| Temp Coeff Voc (%/°C)                 | module.tc_voc_percent   | %/°C |
-| Temp Coeff Vmp (%/°C)                 | module.tc_vpmax_percent | %/°C |
-| Nameplate rating                      | module.nameplaterating  | W    |
+| Description                           | Symbol                    | Unit |
+|:--------------------------------------|:--------------------------|:-----|
+| Description                           | Symbol                    | Unit |
+| FSEC certified                        | module.FSEC_approved      | -    |
+| Maximum power @ STC (W)               | module.pmp                | W    |
+| Open-circuit voltage @ STC (V)        | module.voc                | V    |
+| Short-circuit current @ STC (A)       | module.isc                | A    |
+| Maximum power voltage @ STC (V)       | module.vmp                | V    |
+| Maximum power current @ STC (A)       | module.imp                | A    |
+| Number of cells                       | module.total_number_cells | -    |
+| Maximum overcurrent device rating (A) | module.max_series_fuse    | A    |
+| Maximum system voltage rating (V)     | module.max_system_v       | V    |
+| Temp Coeff Voc (%/°C)                 | module.tc_voc_percent     | %/°C |
+| Temp Coeff Vmp (%/°C)                 | module.tc_vpmax_percent   | %/°C |
+| Nameplate rating                      | module.nameplaterating    | W    |
