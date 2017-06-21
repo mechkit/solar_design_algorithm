@@ -310,7 +310,6 @@ Electrical Metallic Tubing (EMT)
 
 | 40% Fill Area - Over 2 Wires (in2) | Trade Size |
 |:-----------------------------------|:-----------|
-| 0.122                              | 1/2        |
 | 0.213                              | 3/4        |
 | 0.346                              | 1          |
 | 0.598                              | 1-1/4      |
@@ -327,7 +326,7 @@ Electrical Metallic Tubing (EMT)
     // Electrical Metallic Tubing (EMT)
     // EMT | Trade Size
     8: {
-      '0.122': ['1/2'],
+      //'0.122': ['1/2'],
       '0.213': ['3/4'],
       '0.346': ['1'],
       '0.598': ['1-1/4'],
