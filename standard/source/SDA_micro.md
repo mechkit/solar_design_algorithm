@@ -12,123 +12,68 @@ Note: For each section, the symbols are pre-pended by a section name to assist w
 
 ## Micro Inverter System Calculations
 
-### Modules, source circuits, and array
+### Calculations
 
-Determine if the microinverter will connect to one or more modules.
-
-The largest number of microinverters per branch must not exceed the maximum number allowed by the manufacturer.
-
-  error_check.micro_branch = array.largest_string > inverter.max_per_branch;
-  // If error check is true, flag system design failure, and report notice to user.
-  if(error_check.micro_branch ){ report_error( 'System has two many inverters per branch circuit.' );}
-
-The module(s) power must be less than the inverter's maximum power.
-
-    var power_ratio = inverter.max_dc_inputpower / module.pmp;
-    // if < 1, fail
-    // if > 2, multiple modules per inverter possible.
-    error_check.module_inverter_1 = power_ratio < 1;
-    // If error check is true, flag system design failure, and report notice to user.
-    if(error_check.module_inverter_1 ){ report_error( '???' );}
-
-The module(s) operating voltage must be greater than the inverter minimum operating voltage. 
-
-    error_check.module_inverter_2 = module.vmp < inverter.mppt_min;
-    // If error check is true, flag system design failure, and report notice to user.
-    if(error_check.module_inverter_2 ){ report_error( '??? module.vmp < inverter.mppt_min;' );}
-    error_check.module_inverter_3 = module.voc < inverter.vmax;
-    // If error check is true, flag system design failure, and report notice to user.
-    if(error_check.array_test_3 ){ report_error( '??? module.voc < inverter.vmax' );}
-
-The module(s) operating voltage must be less than the inverter maximum operating voltage. 
-    
-    var max_voltage_ratio = inverter.mppt_max / module.vmp;
-    // if < 1, fail
-    // if > 2, multiple modules per inverter possible.
-    error_check.module_inverter_4 = power_ratio < 1;
-    // If error check is true, flag system design failure, and report notice to user.
-    if(error_check.array_test_4 ){ report_error( '???' );}
-
-The module current must be less than the inverter's maximum current.
-
-    error_check.module_inverter_5 = module.ipm > inverter.imax_channel;
-    // If error check is true, flag system design failure, and report notice to user.
-    if(error_check.array_test_5 ){ report_error( '???' );}
-    error_check.module_inverter_6 = module.isc > inverter.isc_channel;
-    // If error check is true, flag system design failure, and report notice to user.
-    if(error_check.array_test_6 ){ report_error( '???' );}
+| Description                   | Symbol           | Calculation                                                 | Unit |
+|:------------------------------|:-----------------|:------------------------------------------------------------|:-----|
+| Maximum source/branch power   | source.max_power | module.pmp * array.largest_string                           | W    |
+| Maximum source/branch current | source.current   | inverter.max_ac_output_current / 240 * array.largest_string | A    |
+| Maximum array power           | array.pmp        | array.num_of_modules * module.pmp                           | W    |
 
 
-
-
-Calculation summary:
-
-| Description                                                               | Symbol                  | Calculation                                                | Unit |
-|:--------------------------------------------------------------------------|:------------------------|:-----------------------------------------------------------|:-----|
-| Maximum Power (W)                                                         | array.pmp               | array.num_of_modules * module.pmp                          | W    |
-| Enter Maximum Number of Parallel Source Circuits per Output Circuit (1-2) | array.modules_per_MPPT  |                                                            | -    |
-| Maximum Power (W)                                                         | source.max_power        | module.pmp * array.largest_string                          | W    |
-| Open-Circuit Voltage (V)                                                  | source.voc              | module.voc * array.largest_string                          | V    |
-| Short-Circuit Current (A)                                                 | source.isc              | module.isc                                                 | A    |
-| Maximum Power Voltage (V)                                                 | source.vmp              | module.vmp * array.largest_string                          | V    |
-| Maximum Power Current (A)                                                 | source.imp              | module.imp                                                 | A    |
-| Source Circuit Maximum Current (A), Isc x 1.25                            | source.Isc_adjusted     | module.isc * 1.25                                          | A    |
-| Number of microinverters per branch circuits (maximum)                    | branch.num_of_inverters | Math.ceil( array.largest_string / array.modules_per_MPPT ) | -    |
-| Maximum current per branch circuit                                        | branch.current          | branch.num_of_inverters * inverter.nominal_ac_output_power | A    |
-
-    array.pmp = array.num_of_modules * module.pmp;
-    array.modules_per_MPPT = NaN;
     source.max_power = module.pmp * array.largest_string;
-    source.voc = module.voc * array.largest_string;
-    source.isc = module.isc;
-    source.vmp = module.vmp * array.largest_string;
-    source.imp = module.imp;
-    source.Isc_adjusted = module.isc * 1.25;
-    branch.num_of_inverters = Math.ceil( array.largest_string / array.modules_per_MPPT );
-    branch.current = branch.num_of_inverters * inverter.nominal_ac_output_power;
+    source.current = inverter.max_ac_output_current / 240 * array.largest_string;
+    array.pmp = array.num_of_modules * module.pmp;
 
-The maximum array voltage is must not exceed the maximum system voltage allowed by the module.
-
-    error_check.array_test_1 = source.voc > module.max_system_v;
-    // If error check is true, flag system design failure, and report notice to user.
-    if(error_check.array_test_1 ){ report_error( 'Maximum system voltage exceeds the modules max system voltage.' );}
-    
-
-The maximum array voltage is must not exceed the maximum system voltage allowed by the building code.
-
-    error_check.array_test_2 = source.voc > array.code_limit_max_voltage;
-    // If error check is true, flag system design failure, and report notice to user.
-    if(error_check.array_test_2){ report_error( 'Maximum system voltage exceeds the maximum voltage allows by code.' );}
-    
-
-The maximum array voltage must not exceed the maximum system voltage allowed by the inverter.
-
-    error_check.array_test_3 = source.voc > inverter.vmax;
-    // If error check is true, flag system design failure, and report notice to user.
-    if(error_check.array_test_3){ report_error( 'Maximum system voltage exceeds the inverter maximum voltage rating' );}
-    
-
-The minimum array voltage must be greater than the inverter minimum operating voltage.
-
-    error_check.array_test_4 = array.min_voltage < inverter.voltage_range_min;
-    // If error check is true, flag system design failure, and report notice to user.
-    if(error_check.array_test_4){ report_error( 'Minimum Array Vmp is less than the inverter minimum operating voltage.' );}
-    
+### Array checks
 
 The total array power must be less than 10,000W.
 
     error_check.power_check_array = array.pmp > 10000;
     // If error check is true, flag system design failure, and report notice to user.
-    if( error_check.power_check_array ){ report_error( 'Array voltage exceeds 10kW' );}
-    
+    if( error_check.power_check_array ){ report_error( 'Array total power exceeds 10kW' );}
 
-The combined DC short circuit current from the array must be less than the maximum allowed per inverter MPPT channel. 
-The combined current is the total current per MPP tracker input. 
-A correction factor of 1.25 is applied to the STC module Isc to account for high irradiance conditions.
+### Branch checks
 
-    error_check.current_check_inverter = ( source.isc * 1.25 ) > inverter.isc_channel;
+The largest number of microinverters per branch must not exceed the maximum number allowed by the manufacturer.
+
+  error_check.micro_branch_too_many_modules = array.largest_string > inverter.max_unitsperbranch;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.micro_branch_too_many_modules ){ report_error( 'The system has too many inverters per branch circuit.' );}
+  
+  error_check.micro_branch_too_few_modules = array.smallest_string < inverter.min_unitsperbranch;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.micro_branch_too_few_modules ){ report_error( 'The system has too many inverters per branch circuit.' );}
+
+The total nominal module power output for each branch must not exceed the manufacturer's limit. 
+
+  error_check.micro_branch_too_much_power = source.max_power > inverter.max_watts_per_branch;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.micro_branch_too_much_power ){ report_error( 'The branch circuit power limit has exceeded the manufacturer's limit.' );}
+
+
+### Module - Inverter checks
+
+The module(s) power must be within the inverter manufacturer's limits.
+
+    error_check.module_power_too_high = module.pmp > inverter.max_panel_wattage;
     // If error check is true, flag system design failure, and report notice to user.
-    if( error_check.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' );}
+    if(error_check.module_power_too_high ){ report_error( 'Microinverter is undersized for module.' );}
+    error_check.module_power_too_low = module.pmp < inverter.min_panel_wattage;
+    // If error check is true, flag system design failure, and report notice to user.
+    if(error_check.module_power_too_low ){ report_error( 'Microinverter is oversized for module.' );}
+
+The module's operating voltage must be less than the inverter maximum operating voltage. 
+    
+    error_check.module_voltage = module.vmp > inverter.vmax;
+    // If error check is true, flag system design failure, and report notice to user.
+    if(error_check.module_voltage ){ report_error( 'Module voltage exceeds inverter maximum.' );}
+    
+The selected module can not have more cells than allowed by the inveter manufacturer.
+    error_check.module_cells = module.total_number_cells > inverter.max_module_cells  ;
+    // If error check is true, flag system design failure, and report notice to user.
+    if(error_check.module_cells ){ report_error( 'Module cell count exceeds the maximum allowed by the inverter.' );}
+
 
 
 ### Inverter
@@ -152,49 +97,27 @@ max_ac_output_current = max_ac_ouput_current_240
 ### Conductor and conduit schedule
 
 For string inverters, these are the circuit names:
-* Exposed source circuit wiring: microinverter cables exposed on the roof.
-* Inverter AC output circuit: AC branch circuits.
-* Inverter AC output combined circuit: AC circuits between the combiner, if used, and panel OCPD.
-
+* PV Microinverter AC sources
 
     var circuit_names = [
-      'exposed source circuit wiring',
-      'pv dc source circuits',
-      'inverter ac output circuit',
+      'PV Microinverter AC sources',
+      //'Combined AC sources',
     ];
     circuit_names.forEach(function(circuit_name){
       circuits[circuit_name] = {};
     });
     
-The array temperature adder is found in NEC table 310.15(B)(3)(c), or Table 1 in appendix, with module.array_offset_from_roof as "Distance Above Roof to Bottom of Conduit (in)".
-    
-    // Use Table 1, lookup: module.array_offset_from_roof, return the first column.
-    circuits['exposed source circuit wiring'].temp_adder = sf.lookup( module.array_offset_from_roof, tables[1] );
-    
+  
 The maximum current and voltage for the array DC circuits are equal to source.isc and source.voc. 
 
-    circuits['exposed source circuit wiring'].max_current = array.combined_isc;
-    circuits['exposed source circuit wiring'].max_voltage = source.voc;
-    circuits['pv dc source circuits'].max_current         = array.combined_isc;
-    circuits['pv dc source circuits'].max_voltage         = source.voc;
-
-The number of DC current carrying conductors is equal to twice the number of strings in the array ( array.num_of_strings * 2 ). 
-Total conductors adds one more for the ground.
-
-    circuits['exposed source circuit wiring'].total_cc_conductors = ( array.num_of_strings * 2 );
-    circuits['exposed source circuit wiring'].total_conductors    = ( array.num_of_strings * 2 ) + 1;
-    circuits['pv dc source circuits'].total_cc_conductors         = ( array.num_of_strings * 2 );
-    circuits['pv dc source circuits'].total_conductors            = ( array.num_of_strings * 2 ) + 1;
+    circuits['PV Microinverter AC sources'].max_current = source.current;
 
 The AC grid voltage is defined by system specifications (user input).
 
-    circuits['inverter ac output circuit'].max_voltage = inverter.grid_voltage;
+    circuits['PV Microinverter AC sources'].max_voltage = inverter.grid_voltage;
 
-The maximum AC output is defined by the inverter manufacturer specifications.
-
-    circuits['inverter ac output circuit'].max_current = inverter.max_ac_output_current;
-    
-AC conductors numbers are defined by the grid voltage.
+The number of AC conductors is defined by the conductors required by that AC voltage, multiplied by the number of branches in the array. 
+Total conductors adds one more for the ground.
 
     var conductors_options = {
       '120V': ['ground','neutral','L1'],
@@ -205,10 +128,10 @@ AC conductors numbers are defined by the grid voltage.
       '480V Delta': ['ground','L1','L2','L3'],
     };
     inverter.conductors = conductors_options[inverter.grid_voltage+'V'];
-    inverter.num_conductors = inverter.conductors.length;
+    inverter.num_conductors = inverter.conductors.length - 1;
 
-    circuits['inverter ac output circuit'].total_cc_conductors = inverter.num_conductors - 1;
-    circuits['inverter ac output circuit'].total_conductors = inverter.num_conductors;
+    circuits['PV Microinverter AC sources'].total_cc_conductors = array.num_of_strings * inverter.num_conductors;
+    circuits['PV Microinverter AC sources'].total_conductors = array.num_of_strings * inverter.num_conductors + 1;
     
 
 For each circuit, calculate the following.
@@ -216,10 +139,9 @@ For each circuit, calculate the following.
     circuit_names.forEach(function(circuit_name, i){
       var circuit = circuits[circuit_name];
       circuit.id = i;
-
       
       
-      circuit.power_type = sf.index( ['DC', 'DC', 'AC'], circuit.id );
+      circuit.power_type = sf.index( ['AC', 'AC', 'AC'], circuit.id );
       // If temperature adder is not defined, set it to 0 for use in further calculations.
       circuit.temp_adder = sf.if( circuit.temp_adder, circuit.temp_adder, 0 );
       
@@ -233,33 +155,21 @@ Rooftop array circuits also have a temperature adjustment defined above.
       // Use Table 3, lookup: circuit.total_cc_conductors, return the first column.
       circuit.conductors_adj_factor = sf.lookup( circuit.total_cc_conductors , tables[3] );
 
-There are three options to calculate the minimum required current:
+Minimum required current is 1.25 times the cicuit's max current:
 
-  1. circuit.max_current * 1.25;
-  2. circuit.max_current / ( circuit.temp_correction_factor * circuit.conductors_adj_factor );
-  3. circuit.max_current * 1.25 * 1.25;
-
-
-      circuit.min_req_cond_current_1 = circuit.max_current * 1.25;
-      circuit.min_req_cond_current_2 = circuit.max_current / ( circuit.temp_correction_factor * circuit.conductors_adj_factor );
-      circuit.min_req_cond_current_3 = circuit.max_current * 1.25 * 1.25;
-
-For AC circuits, the maximum of 1 and 2 is used. For DC circuits, the maximum of 2 and 3 is used.
-
-      circuit.min_req_cond_current    = sf.max( circuit.min_req_cond_current_1, circuit.min_req_cond_current_2 );
-      circuit.min_req_OCPD_current_DC = sf.max( circuit.min_req_cond_current_2, circuit.min_req_cond_current_3  );
-      circuit.min_req_OCPD_current = sf.if( circuit.power_type === 'DC', circuit.min_req_OCPD_current_DC, circuit.min_req_cond_current_1);
+      circuit.min_req_OCPD_current = circuit.max_current * 1.25;
 
 For strings per MPP tracker of 2 or less, or for inverters with built in OCPD, additional DC OCPD is not required. The AC circuits do require OCPD at the panel.
 
-      circuit.OCPD_required = sf.index( [false, false, true ], circuit.id );
-      circuit.ocpd_type = sf.index( ['NA', 'PV Fuse', 'Circuit Breaker'], circuit.id );
+      circuit.OCPD_required = sf.index( [ true ], circuit.id );
+      circuit.ocpd_type = sf.index( ['Circuit Breaker'], circuit.id );
       
 Choose the OCPD that is greater or equal to the minimum required current.
 
-      // Use Table 9, lookup: circuit.min_req_OCPD_current, finst the next highest or matching value, return the index column.
+      // Use Table 9, lookup: circuit.min_req_OCPD_current, find the next highest or matching value, return the index column.
       circuit.OCPD = sf.lookup( circuit.min_req_OCPD_current, tables[9], 0, true, true);
-      if( circuit_name === 'inverter ac output circuit' ){ inverter.OCPD = circuit.OCPD; }
+      if( circuit.OCPD > 20 ){  circuit.OCPD = 20 }
+      if( circuit_name === 'PV Microinverter AC sources' ){ inverter.OCPD = circuit.OCPD; }
 
 Choose the conductor with a current rating that is greater than the OCPD rating from NEC table 310.15(B)(16). 
 NEC chapter 9 table 8 provides more details on the conductor. For DC circuits, 10 AWG wire is used as a best practice. 
@@ -270,22 +180,8 @@ NEC chapter 9 table 8 provides more details on the conductor. For DC circuits, 1
       circuit.conductor_current = sf.lookup( circuit.min_req_cond_current, tables[4], 0, true);
       // Use Table 4, lookup: circuit.conductor_current, return the first column.
       circuit.conductor_size_min = sf.lookup( circuit.conductor_current, tables[4] );
-      if( circuit_name === 'exposed source circuit wiring' ){ 
-        circuit.conductor_size_min = '10'; 
-      }
-      if( circuit_name === 'pv dc source circuits' ){ 
-        circuit.conductor_size_min = '10'; 
-      }
-      if( circuit_name === 'inverter ac output circuit' ){
-        if( circuit.OCPD === 15){
-          circuit.conductor_size_min = '14'; 
-        } else if( circuit.OCPD === 20){
-          circuit.conductor_size_min = '12';
-        } else if( circuit.OCPD === 25){
-          circuit.conductor_size_min = '10';
-        } else if( circuit.OCPD === 30){
-          circuit.conductor_size_min = '10';
-        }
+      if( circuit.conductor_size_min > 10 ){
+        circuit.conductor_size_min = 10; 
       }
       // Use Table 5, lookup: circuit.conductor_size_min, return the first column.
       circuit.conductor_current = sf.lookup( circuit.conductor_size_min, tables[5], 1);
@@ -295,27 +191,18 @@ NEC chapter 9 table 8 provides more details on the conductor. For DC circuits, 1
       circuit.conductor_diameter = sf.lookup( circuit.conductor_size_min, tables[6], 2 );
       circuit.min_req_conduit_area_40 = circuit.total_conductors * ( 0.25 * PI() * math.pow(circuit.conductor_diameter, 2) );
       
-The NEC article 352 and 358 tables are used to find a conduit with a sufficent 40% fill rate to hold the total conductor size for all the conductors.
+The NEC article 352 and 358 tables are used to find a conduit with a sufficient 40% fill rate to hold the total conductor size for all the conductors.
 
       // Use Table 7, lookup: circuit.min_req_conduit_area_40, find the next highest value, return the first column.
-      circuit.min_conduit_size_PVC_80 = sf.lookup( circuit.min_req_conduit_area_40, tables[7], 1, true );
+      // circuit.min_conduit_size_PVC_80 = sf.lookup( circuit.min_req_conduit_area_40, tables[7], 1, true );
       // Use Table 8, lookup: circuit.min_req_conduit_area_40, find the next highest value, return the first column.
       circuit.min_conduit_size_EMT = sf.lookup( circuit.min_req_conduit_area_40, tables[8], 1, true );
-      circuit.min_conduit_size = circuit.min_conduit_size_PVC_80 || circuit.min_conduit_size_EMT;
+      circuit.min_conduit_size = circuit.min_conduit_size_EMT;
 
 
 Select further wire details based on code requirements and best practices.
 
-Exposed source circuit wiring:
-* Conductor: 'DC+/DC-, EGC'
-* Location: 'Free air'
-* Material: 'CU'
-* Type: 'PV Wire, bare'
-* Volt rating: 600
-* Wet temp rating: 90
-* Conduit type: 'NA'
-
-PV DC source circuits:
+PV Microinverter AC sources:
 * Conductor: 'DC+/DC-, EGC'
 * Location: 'Conduit/Exterior'
 * Material: 'CU'
@@ -324,22 +211,14 @@ PV DC source circuits:
 * Wet temp rating: 90
 * Conduit type: 'Metallic'
 
-Inverter ac output circuit:
-* Conductor: 'L1/L2, N, EGC'
-* Location: 'Conduit/Interior'
-* Material: 'CU'
-* Type: 'THWN-2'
-* Volt rating: 600
-* Wet temp rating: 90
-* Conduit type: 'Metallic'
-      
-      circuit.conductor = sf.index( ['DC+/DC-, EGC', 'DC+/DC-, EGC', 'L1/L2, N, EGC'], circuit.id );
-      circuit.location = sf.index( ['Free air', 'Conduit/Exterior', 'Conduit/Interior'], circuit.id );
+    
+      circuit.conductor = sf.index( ['L1/L2, N, EGC', 'L1/L2, N, EGC'], circuit.id );
+      circuit.location = sf.index( ['Conduit/Interior', 'Conduit/Interior'], circuit.id );
       circuit.material = 'CU';
-      circuit.type = sf.index( ['PV Wire, bare', 'THWN-2', 'THWN-2'], circuit.id );
+      circuit.type = sf.index( ['THWN-2', 'THWN-2'], circuit.id );
       circuit.volt_rating = 600;
       circuit.wet_temp_rating = 90;
-      circuit.conduit_type = sf.index( ['NA', 'Metallic', 'Metallic'], circuit.id );
+      circuit.conduit_type = sf.index( ['Metallic', 'Metallic'], circuit.id );
 
       
       
@@ -365,8 +244,8 @@ At least one of the following checks must not fail:
 * The sum of the ampere ratings of all overcurrent devices on panelboards exceeded the ampacity of the busbar.                                                                       
 
 
-    interconnection.inverter_output_cur_sum = interconnection.inverter_output_cur_sum || inverter.max_ac_output_current;
-    interconnection.inverter_ocpd_dev_sum = interconnection.inverter_ocpd_dev_sum || inverter.OCPD;
+    interconnection.inverter_output_cur_sum = inverter.max_ac_output_current * array.num_of_strings;
+    interconnection.inverter_ocpd_dev_sum = inverter.OCPD;
 
     interconnection.check_1 = ( ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating;
     interconnection.check_2 = ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2;
