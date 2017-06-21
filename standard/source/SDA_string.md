@@ -97,7 +97,7 @@ The total array power must be less than 10,000W.
 
     error_check.power_check_array = array.pmp > 10000;
     // If error check is true, flag system design failure, and report notice to user.
-    if( error_check.power_check_array ){ report_error( 'Array voltage exceeds 10kW' );}
+    if( error_check.power_check_array ){ report_error( 'Array total power exceeds 10kW' );}
     
 
 The combined DC short circuit current from the array must be less than the maximum allowed per inverter MPPT channel. 
@@ -235,7 +235,7 @@ For strings per MPP tracker of 2 or less, or for inverters with built in OCPD, a
       
 Choose the OCPD that is greater or equal to the minimum required current.
 
-      // Use Table 9, lookup: circuit.min_req_OCPD_current, finst the next highest or matching value, return the index column.
+      // Use Table 9, lookup: circuit.min_req_OCPD_current, find the next highest or matching value, return the index column.
       circuit.OCPD = sf.lookup( circuit.min_req_OCPD_current, tables[9], 0, true, true);
       if( circuit_name === 'inverter ac output circuit' ){ inverter.OCPD = circuit.OCPD; }
 
@@ -279,7 +279,7 @@ The NEC article 352 and 358 tables are used to find a conduit with a sufficent 4
       circuit.min_conduit_size_PVC_80 = sf.lookup( circuit.min_req_conduit_area_40, tables[7], 1, true );
       // Use Table 8, lookup: circuit.min_req_conduit_area_40, find the next highest value, return the first column.
       circuit.min_conduit_size_EMT = sf.lookup( circuit.min_req_conduit_area_40, tables[8], 1, true );
-      circuit.min_conduit_size = circuit.min_conduit_size_PVC_80 || circuit.min_conduit_size_EMT;
+      circuit.min_conduit_size = circuit.min_conduit_size_EMT;
 
 
 Select further wire details based on code requirements and best practices.
