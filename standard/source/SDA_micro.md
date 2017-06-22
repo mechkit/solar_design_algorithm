@@ -20,10 +20,28 @@ Note: For each section, the symbols are pre-pended by a section name to assist w
 | Maximum source/branch current | source.current   | inverter.max_ac_output_current / 240 * array.largest_string | A    |
 | Maximum array power           | array.pmp        | array.num_of_modules * module.pmp                           | W    |
 
-
     source.max_power = module.pmp * array.largest_string;
-    source.current = inverter.max_ac_output_current / 240 * array.largest_string;
+    source.current = inverter.max_ac_output_current * array.largest_string;
     array.pmp = array.num_of_modules * module.pmp;
+
+### Inverter
+
+The nominal_ac_output_power is selected from fields based on the user selected grid voltage. As an example, if the user selects 240 VAC, then:
+
+nominal_ac_output_power = nominal_ac_output_power_240
+max_ac_output_current = max_ac_ouput_current_240
+
+    inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
+    inverter.max_ac_output_current = inverter['max_ac_output_current_'+inverter.grid_voltage];
+
+If max_ac_ocpd is not provided by the manufacturer, it is calculated as follows:
+
+AC_OCPD_max = max_ac_output_current * 1.25
+
+    inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
+
+    
+
 
 ### Array checks
 
@@ -73,26 +91,6 @@ The selected module can not have more cells than allowed by the inveter manufact
     error_check.module_cells = module.total_number_cells > inverter.max_module_cells  ;
     // If error check is true, flag system design failure, and report notice to user.
     if(error_check.module_cells ){ report_error( 'Module cell count exceeds the maximum allowed by the inverter.' );}
-
-
-
-### Inverter
-
-If max_ac_ocpd is not provided by the manufacturer, it is calculated as follows:
-
-AC_OCPD_max = max_ac_output_current * 1.25
-
-    inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
-
-The nominal_ac_output_power is selected from fields based on the user selected grid voltage. As an example, if the user selects 240 VAC, then:
-
-nominal_ac_output_power = nominal_ac_output_power_240
-max_ac_output_current = max_ac_ouput_current_240
-
-    inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
-    inverter.max_ac_output_current = inverter['max_ac_ouput_current_'+inverter.grid_voltage];
-    
-
 
 ### Conductor and conduit schedule
 
@@ -183,6 +181,10 @@ NEC chapter 9 table 8 provides more details on the conductor. For DC circuits, 1
       if( circuit.conductor_size_min > 10 ){
         circuit.conductor_size_min = 10; 
       }
+      circuit.ground_size_min = circuit.conductor_size_min;
+      if( circuit.ground_size_min > 8 ){
+        circuit.ground_size_min = 8; 
+      }
       // Use Table 5, lookup: circuit.conductor_size_min, return the first column.
       circuit.conductor_current = sf.lookup( circuit.conductor_size_min, tables[5], 1);
       // Use Table 6, lookup: circuit.conductor_size_min, return the first column.
@@ -228,7 +230,7 @@ PV Microinverter AC sources:
         circuit.ocpd_type = '-';
         circuit.OCPD = '-';
       }
-      circuit.conductor_size_min = circuit.conductor_size_min + ', ' + circuit.conductor_size_min;
+      circuit.conductor_size_min = circuit.conductor_size_min;
       //////
       
     });
