@@ -28,8 +28,12 @@ var SDA = function(system_settings){
   /// calculations from standard document ///
   ///////////////////////////////////////////
   source.max_power = module.pmp * array.largest_string;
-  source.current = inverter.max_ac_output_current / 240 * array.largest_string;
+  source.current = inverter.max_ac_output_current * array.largest_string;
   array.pmp = array.num_of_modules * module.pmp;
+  inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
+  inverter.max_ac_output_current = inverter['max_ac_output_current_'+inverter.grid_voltage];
+  inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
+  
   error_check.power_check_array = array.pmp > 10000;
   // If error check is true, flag system design failure, and report notice to user.
   if( error_check.power_check_array ){ report_error( 'Array total power exceeds 10kW' );}
@@ -47,10 +51,6 @@ var SDA = function(system_settings){
   error_check.module_cells = module.total_number_cells > inverter.max_module_cells  ;
   // If error check is true, flag system design failure, and report notice to user.
   if(error_check.module_cells ){ report_error( 'Module cell count exceeds the maximum allowed by the inverter.' );}
-  inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
-  inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
-  inverter.max_ac_output_current = inverter['max_ac_ouput_current_'+inverter.grid_voltage];
-  
   var circuit_names = [
     'PV Microinverter AC sources',
     //'Combined AC sources',
@@ -106,6 +106,10 @@ var SDA = function(system_settings){
     if( circuit.conductor_size_min > 10 ){
       circuit.conductor_size_min = 10; 
     }
+    circuit.ground_size_min = circuit.conductor_size_min;
+    if( circuit.ground_size_min > 8 ){
+      circuit.ground_size_min = 8; 
+    }
     // Use Table 5, lookup: circuit.conductor_size_min, return the first column.
     circuit.conductor_current = sf.lookup( circuit.conductor_size_min, tables[5], 1);
     // Use Table 6, lookup: circuit.conductor_size_min, return the first column.
@@ -135,7 +139,7 @@ var SDA = function(system_settings){
       circuit.ocpd_type = '-';
       circuit.OCPD = '-';
     }
-    circuit.conductor_size_min = circuit.conductor_size_min + ', ' + circuit.conductor_size_min;
+    circuit.conductor_size_min = circuit.conductor_size_min;
     //////
     
   });

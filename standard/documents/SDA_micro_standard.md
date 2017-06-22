@@ -21,6 +21,20 @@ Note: For each section, the symbols are pre-pended by a section name to assist w
 | Maximum array power           | array.pmp        | array.num_of_modules * module.pmp                           | W    |
 
 
+### Inverter
+
+The nominal_ac_output_power is selected from fields based on the user selected grid voltage. As an example, if the user selects 240 VAC, then:
+
+nominal_ac_output_power = nominal_ac_output_power_240
+max_ac_output_current = max_ac_ouput_current_240
+
+
+If max_ac_ocpd is not provided by the manufacturer, it is calculated as follows:
+
+AC_OCPD_max = max_ac_output_current * 1.25
+
+
+
 
 ### Array checks
 
@@ -53,22 +67,6 @@ The module(s) power must be within the inverter manufacturer's limits.
 
 The module's operating voltage must be less than the inverter maximum operating voltage. 
 The selected module can not have more cells than allowed by the inveter manufacturer.
-
-
-
-### Inverter
-
-If max_ac_ocpd is not provided by the manufacturer, it is calculated as follows:
-
-AC_OCPD_max = max_ac_output_current * 1.25
-
-
-The nominal_ac_output_power is selected from fields based on the user selected grid voltage. As an example, if the user selects 240 VAC, then:
-
-nominal_ac_output_power = nominal_ac_output_power_240
-max_ac_output_current = max_ac_ouput_current_240
-
-
 
 ### Conductor and conduit schedule
 
