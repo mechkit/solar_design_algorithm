@@ -1,0 +1,29 @@
+var settings_constants = require('./settings/settings_constants.js');
+var tables = require('./tables.js');
+var f = require('./functions/functions.js');
+var math = require('mathjs');
+var sf = require('spreadsheet_functions');
+
+var PI = function(){
+  return math.pi;
+};
+
+var SDA = function(system_settings){
+  var notes = system_settings.state.notes;
+
+  var array = system_settings.state.system.array;
+  var module = system_settings.state.system.module;
+  var source = system_settings.state.system.source;
+  var system = system_settings.state.system.module;
+  var inverter = system_settings.state.system.inverter;
+  var interconnection = system_settings.state.system.interconnection;
+  var circuits = system_settings.state.system.circuits;
+  var error_check = system_settings.state.system.error_check;
+
+  var report_error = function(error_message){
+    notes.errors.push(error_message);
+  };
+
+  ///////////////////////////////////////////
+  /// calculations from standard document ///
+  ///////////////////////////////////////////
