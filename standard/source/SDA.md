@@ -88,12 +88,40 @@ Inverter:
 | Maximum AC output current 240                                      | inverter.max_ac_output_current_240   | V    |
 | Maximum AC output current 277                                      | inverter.max_ac_output_current_277   | V    |
 | Maximum AC output current 480                                      | inverter.max_ac_output_current_480   | V    |
-| Maximum units per branch                                           | inverter.max_unitsperbranch          | -    |
-| Minimum units per branch                                           | inverter.min_unitsperbranch          | -    |
-| Minimum panel wattage                                              | inverter.min_panel_wattage           | W    |
-| Maximum panel wattage                                              | inverter.max_panel_wattage           | W    |
-| Maximum number of cells per panel                                  | inverter.max_module_cells            | -    |
-| Maximum watts per string                                           | inverter.max_watts_per_branch        | -    |
+
+Microinverters also have the following values.
+
+| Description                       | Symbol                        | Unit |
+|:----------------------------------|:------------------------------|:-----|
+| Maximum units per branch          | inverter.max_unitsperbranch   | -    |
+| Minimum units per branch          | inverter.min_unitsperbranch   | -    |
+| Minimum panel wattage             | inverter.min_panel_wattage    | W    |
+| Maximum panel wattage             | inverter.max_panel_wattage    | W    |
+| Maximum number of cells per panel | inverter.max_module_cells     | -    |
+| Maximum watts per string          | inverter.max_watts_per_branch | -    |
+
+DC-DC optimizer systems also have the following values for the main inverters.
+
+| Description              | Symbol                      | Unit |
+|:-------------------------|:----------------------------|:-----|
+| Nominal DC input voltage | inverter.dc_voltage_nominal | V    |
+
+
+DC-DC optimizers have the following values.
+
+| Description                     | Symbol                         | Unit |
+|:--------------------------------|:-------------------------------|:-----|
+| Rated max power                 | optimizer.rated_max_power      | W    |
+| Max input voltage               | optimizer.max_input_voltage    | V    |
+| MPPT operating range min        | optimizer.mppt_op_range_min    | V    |
+| MPPT operating range max        | optimizer.mppt_op_range_max    | V    |
+| Max Short Circuit Current (Isc) | optimizer.max_isc              | A    |
+| Max output current              | optimizer.max_output_current   | A    |
+| Max output voltage              | optimizer.max_output_voltage   | V    |
+| Min optimizers / string         | optimizer.min_optis_per_string | -    |
+| Max optimizers / string         | optimizer.max_optis_per_string | -    |
+| Max power / string              | optimizer.max_power_per_string | -    |
+
 
 Module:
 
