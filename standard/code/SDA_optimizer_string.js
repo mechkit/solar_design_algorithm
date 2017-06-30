@@ -27,27 +27,29 @@ var SDA = function(system_settings){
   ///////////////////////////////////////////
   /// calculations from standard document ///
   ///////////////////////////////////////////
+  source.vmp = module.pmp / source.max_power * inverter.dc_voltage_nominal;
+  source.imp = source.max_power / inverter.dc_voltage_nominal;
+  source.voc = 1 * array.largest_string;
+  source.isc = 0.6; //amps
+  
+  inverter.dc_voltage_nominal = inverter.mppt_max;
+  source.vmp = module.pmp / source.max_power * inverter.dc_voltage_nominal;
+  source.imp = source.max_power / inverter.dc_voltage_nominal;
+  source.voc = 1 * array.largest_string;
+  source.isc = 0.6; //amps
+  source.i_max = optimizer.max_output_current;
   source.max_power = module.pmp * array.largest_string;
-  source.voc = module.voc * array.largest_string;
-  source.isc = module.isc;
-  source.vmp = module.vmp * array.largest_string;
-  source.imp = module.imp;
   source.Isc_adjusted = module.isc * 1.25;
-  array.max_sys_voltage_1 = source.voc * array.voltage_correction_factor;
-  array.max_sys_voltage_2 = source.voc * ( 1 + module.tc_voc_percent / 100 * ( array.min_temp - 25));
-  array.max_sys_voltage = sf.max( array.max_sys_voltage_1, array.max_sys_voltage_2 );
-  array.min_voltage = array.smallest_string * module.vmp * ( 1 + module.tc_vpmax_percent / 100 * ( array.max_temp - 25 ) );
+  array.max_sys_voltage = inverter.dc_voltage_nominal;
+  array.min_voltage = inverter.dc_voltage_nominal;
   array.pmp = array.num_of_modules * module.pmp;
-  array.voc = source.voc;
-  array.isc = module.isc * array.num_of_strings;
-  array.vmp = module.vmp * array.largest_string;
-  array.imp = module.imp * array.num_of_strings;
-  array.isc_adjusted = array.isc * 1.25;
-  array.vmp_adjusted = array.max_sys_voltage_2;
   array.circuits_per_MPPT = Math.ceil( array.num_of_strings / inverter.mppt_channels );
-  array.combined_isc = source.isc * array.circuits_per_MPPT;
-  array.combined_isc_adjusted = module.isc * 1.25 * array.circuits_per_MPPT;
-  array.max_sys_voltage_2 = array.max_sys_voltage_2;
+  array.combined_isc = source.i_max * array.circuits_per_MPPT;
+  module.max_voltage = module.voc * ( 1 + module.tc_voc_percent / 100 * ( array.min_temp - 25));
+  inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
+  inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
+  inverter.max_ac_output_current = inverter['max_ac_ouput_current_'+inverter.grid_voltage];
+  
   
   error_check.array_test_1 = array.max_sys_voltage > module.max_system_v;
   // If error check is true, flag system design failure, and report notice to user.
@@ -61,7 +63,7 @@ var SDA = function(system_settings){
   // If error check is true, flag system design failure, and report notice to user.
   if(error_check.array_test_3){ report_error( 'Maximum system voltage exceeds the inverter maximum voltage rating' );}
   
-  error_check.array_test_4 = array.min_voltage < inverter.voltage_range_min;
+  error_check.array_test_4 = array.min_voltage <= inverter.voltage_range_min;
   // If error check is true, flag system design failure, and report notice to user.
   if(error_check.array_test_4){ report_error( 'Minimum Array Vmp is less than the inverter minimum operating voltage.' );}
   
@@ -72,10 +74,25 @@ var SDA = function(system_settings){
   error_check.current_check_inverter = ( array.combined_isc * 1.25 ) > inverter.isc_channel;
   // If error check is true, flag system design failure, and report notice to user.
   if( error_check.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' );}
-  inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
-  inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
-  inverter.max_ac_output_current = inverter['max_ac_ouput_current_'+inverter.grid_voltage];
   
+  
+  error_check.module_power_too_high = module.pmp > optimizer.optimizer.rated_max_power;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.module_power_too_high ){ report_error( 'Optimizer is undersized for module.' );}
+  error_check.module_voltage_too_low = module.vmp < optimizer.mppt_op_range_min ;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.module_voltage_too_low ){ report_error( 'Module does not meet minimum optimizer operating voltage.' );}
+  error_check.module_voltage_too_high = module.vmp > optimizer.mppt_op_range_max ;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.module_voltage_too_high ){ report_error( 'Module exceeds optimizer operating voltage range.' );}
+  
+  error_check.module_voltage = module.vmp > inverter.vmax;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.module_voltage ){ report_error( 'Module voltage exceeds inverter maximum.' );}
+  
+  error_check.module_max_voltage = module.max_voltage > optimizer.max_input_voltage ;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.module_max_voltage ){ report_error( 'Module maximum voltage exceeds the maximum allowed by the optimizer.' );}
   var circuit_names = [
     'exposed source circuit wiring',
     'pv dc source circuits',
