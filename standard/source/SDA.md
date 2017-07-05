@@ -111,7 +111,8 @@ DC-DC optimizers have the following values.
 
 | Description                     | Symbol                         | Unit |
 |:--------------------------------|:-------------------------------|:-----|
-| Rated max power                 | optimizer.rated_max_power      | W    |
+| Manufacturer name               | optimizer.manufacturer_name    | -    |
+| Model name                      | optimizer.name                 | -    |
 | Max input voltage               | optimizer.max_input_voltage    | V    |
 | MPPT operating range min        | optimizer.mppt_op_range_min    | V    |
 | MPPT operating range max        | optimizer.mppt_op_range_max    | V    |
