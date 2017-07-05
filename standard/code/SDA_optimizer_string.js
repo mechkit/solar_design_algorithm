@@ -16,6 +16,7 @@ var SDA = function(system_settings){
   var source = system_settings.state.system.source;
   var system = system_settings.state.system.module;
   var inverter = system_settings.state.system.inverter;
+  var optimizer = system_settings.state.system.optimizer;
   var interconnection = system_settings.state.system.interconnection;
   var circuits = system_settings.state.system.circuits;
   var error_check = system_settings.state.system.error_check;
@@ -48,7 +49,7 @@ var SDA = function(system_settings){
   module.max_voltage = module.voc * ( 1 + module.tc_voc_percent / 100 * ( array.min_temp - 25));
   inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
   inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
-  inverter.max_ac_output_current = inverter['max_ac_ouput_current_'+inverter.grid_voltage];
+  inverter.max_ac_output_current = inverter['max_ac_output_current_'+inverter.grid_voltage];
   
   
   error_check.array_test_1 = array.max_sys_voltage > module.max_system_v;
@@ -76,7 +77,7 @@ var SDA = function(system_settings){
   if( error_check.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' );}
   
   
-  error_check.module_power_too_high = module.pmp > optimizer.optimizer.rated_max_power;
+  error_check.module_power_too_high = module.pmp > optimizer.rated_max_power;
   // If error check is true, flag system design failure, and report notice to user.
   if(error_check.module_power_too_high ){ report_error( 'Optimizer is undersized for module.' );}
   error_check.module_voltage_too_low = module.vmp < optimizer.mppt_op_range_min ;
@@ -134,10 +135,20 @@ var SDA = function(system_settings){
     var circuit = circuits[circuit_name];
     circuit.id = i;
     
-    
     circuit.power_type = sf.index( ['DC', 'DC', 'AC'], circuit.id );
     // If temperature adder is not defined, set it to 0 for use in further calculations.
     circuit.temp_adder = sf.if( circuit.temp_adder, circuit.temp_adder, 0 );
+    
+    
+    
+    circuit.conductor = sf.index( ['DC+/DC-, EGC', 'DC+/DC-, EGC', 'L1/L2, N, EGC'], circuit.id );
+    circuit.location = sf.index( ['Free air', 'Conduit/Exterior', 'Conduit/Interior'], circuit.id );
+    circuit.material = 'CU';
+    circuit.type = sf.index( ['PV Wire, bare', 'THWN-2', 'THWN-2'], circuit.id );
+    circuit.volt_rating = 600;
+    circuit.wet_temp_rating = 90;
+    circuit.conduit_type = sf.index( ['-', 'Metallic', 'Metallic'], circuit.id );      
+    
     
     
     circuit.max_conductor_temp = array.max_temp + circuit.temp_adder;
@@ -193,14 +204,7 @@ var SDA = function(system_settings){
     // Use Table 8, lookup: circuit.min_req_conduit_area_40, find the next highest value, return the first column.
     circuit.min_conduit_size_EMT = sf.lookup( circuit.min_req_conduit_area_40, tables[8], 1, true );
     circuit.min_conduit_size = circuit.min_conduit_size_EMT;
-    
-    circuit.conductor = sf.index( ['DC+/DC-, EGC', 'DC+/DC-, EGC', 'L1/L2, N, EGC'], circuit.id );
-    circuit.location = sf.index( ['Free air', 'Conduit/Exterior', 'Conduit/Interior'], circuit.id );
-    circuit.material = 'CU';
-    circuit.type = sf.index( ['PV Wire, bare', 'THWN-2', 'THWN-2'], circuit.id );
-    circuit.volt_rating = 600;
-    circuit.wet_temp_rating = 90;
-    circuit.conduit_type = sf.index( ['NA', 'Metallic', 'Metallic'], circuit.id );
+    if( circuit.conduit_type === '-' ){ circuit.min_conduit_size = '-'; }
     
     
     ///////

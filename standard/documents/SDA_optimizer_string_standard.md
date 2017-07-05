@@ -131,7 +131,34 @@ AC conductors numbers are defined by the grid voltage.
 
 For each circuit, calculate the following.
 
+Select circuit details based on code requirements and best practices.
 
+Exposed source circuit wiring:
+* Conductor: 'DC+/DC-, EGC'
+* Location: 'Free air'
+* Material: 'CU'
+* Type: 'PV Wire, bare'
+* Volt rating: 600
+* Wet temp rating: 90
+* Conduit type: '-'
+
+PV DC source circuits:
+* Conductor: 'DC+/DC-, EGC'
+* Location: 'Conduit/Exterior'
+* Material: 'CU'
+* Type: 'THWN-2'
+* Volt rating: 600
+* Wet temp rating: 90
+* Conduit type: 'Metallic'
+
+Inverter ac output circuit:
+* Conductor: 'L1/L2, N, EGC'
+* Location: 'Conduit/Interior'
+* Material: 'CU'
+* Type: 'THWN-2'
+* Volt rating: 600
+* Wet temp rating: 90
+* Conduit type: 'Metallic'
 The array maximum temperature of the array is equal to the 2% maximum temperature at the install location, or nearest weather station. 
 For a state wide design, the largest maximum temperature for the state is used.
 Rooftop array circuits also have a temperature adjustment defined above.
@@ -159,34 +186,7 @@ The NEC article 352 and 358 tables are used to find a conduit with a sufficent 4
 
 
 
-Select further wire details based on code requirements and best practices.
 
-Exposed source circuit wiring:
-* Conductor: 'DC+/DC-, EGC'
-* Location: 'Free air'
-* Material: 'CU'
-* Type: 'PV Wire, bare'
-* Volt rating: 600
-* Wet temp rating: 90
-* Conduit type: 'NA'
-
-PV DC source circuits:
-* Conductor: 'DC+/DC-, EGC'
-* Location: 'Conduit/Exterior'
-* Material: 'CU'
-* Type: 'THWN-2'
-* Volt rating: 600
-* Wet temp rating: 90
-* Conduit type: 'Metallic'
-
-Inverter ac output circuit:
-* Conductor: 'L1/L2, N, EGC'
-* Location: 'Conduit/Interior'
-* Material: 'CU'
-* Type: 'THWN-2'
-* Volt rating: 600
-* Wet temp rating: 90
-* Conduit type: 'Metallic'
 
 
 
