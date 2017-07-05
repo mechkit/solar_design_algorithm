@@ -237,12 +237,49 @@ For each circuit, calculate the following.
     circuit_names.forEach(function(circuit_name, i){
       var circuit = circuits[circuit_name];
       circuit.id = i;
-
-      
       
       circuit.power_type = sf.index( ['DC', 'DC', 'AC'], circuit.id );
       // If temperature adder is not defined, set it to 0 for use in further calculations.
       circuit.temp_adder = sf.if( circuit.temp_adder, circuit.temp_adder, 0 );
+      
+      
+Select circuit details based on code requirements and best practices.
+
+Exposed source circuit wiring:
+* Conductor: 'DC+/DC-, EGC'
+* Location: 'Free air'
+* Material: 'CU'
+* Type: 'PV Wire, bare'
+* Volt rating: 600
+* Wet temp rating: 90
+* Conduit type: '-'
+
+PV DC source circuits:
+* Conductor: 'DC+/DC-, EGC'
+* Location: 'Conduit/Exterior'
+* Material: 'CU'
+* Type: 'THWN-2'
+* Volt rating: 600
+* Wet temp rating: 90
+* Conduit type: 'Metallic'
+
+Inverter ac output circuit:
+* Conductor: 'L1/L2, N, EGC'
+* Location: 'Conduit/Interior'
+* Material: 'CU'
+* Type: 'THWN-2'
+* Volt rating: 600
+* Wet temp rating: 90
+* Conduit type: 'Metallic'
+      
+      circuit.conductor = sf.index( ['DC+/DC-, EGC', 'DC+/DC-, EGC', 'L1/L2, N, EGC'], circuit.id );
+      circuit.location = sf.index( ['Free air', 'Conduit/Exterior', 'Conduit/Interior'], circuit.id );
+      circuit.material = 'CU';
+      circuit.type = sf.index( ['PV Wire, bare', 'THWN-2', 'THWN-2'], circuit.id );
+      circuit.volt_rating = 600;
+      circuit.wet_temp_rating = 90;
+      circuit.conduit_type = sf.index( ['-', 'Metallic', 'Metallic'], circuit.id );      
+      
       
 The array maximum temperature of the array is equal to the 2% maximum temperature at the install location, or nearest weather station. 
 For a state wide design, the largest maximum temperature for the state is used.
@@ -323,44 +360,10 @@ The NEC article 352 and 358 tables are used to find a conduit with a sufficent 4
       // Use Table 8, lookup: circuit.min_req_conduit_area_40, find the next highest value, return the first column.
       circuit.min_conduit_size_EMT = sf.lookup( circuit.min_req_conduit_area_40, tables[8], 1, true );
       circuit.min_conduit_size = circuit.min_conduit_size_EMT;
+      if( circuit.conduit_type === '-' ){ circuit.min_conduit_size = '-'; }
 
 
-Select further wire details based on code requirements and best practices.
 
-Exposed source circuit wiring:
-* Conductor: 'DC+/DC-, EGC'
-* Location: 'Free air'
-* Material: 'CU'
-* Type: 'PV Wire, bare'
-* Volt rating: 600
-* Wet temp rating: 90
-* Conduit type: 'NA'
-
-PV DC source circuits:
-* Conductor: 'DC+/DC-, EGC'
-* Location: 'Conduit/Exterior'
-* Material: 'CU'
-* Type: 'THWN-2'
-* Volt rating: 600
-* Wet temp rating: 90
-* Conduit type: 'Metallic'
-
-Inverter ac output circuit:
-* Conductor: 'L1/L2, N, EGC'
-* Location: 'Conduit/Interior'
-* Material: 'CU'
-* Type: 'THWN-2'
-* Volt rating: 600
-* Wet temp rating: 90
-* Conduit type: 'Metallic'
-      
-      circuit.conductor = sf.index( ['DC+/DC-, EGC', 'DC+/DC-, EGC', 'L1/L2, N, EGC'], circuit.id );
-      circuit.location = sf.index( ['Free air', 'Conduit/Exterior', 'Conduit/Interior'], circuit.id );
-      circuit.material = 'CU';
-      circuit.type = sf.index( ['PV Wire, bare', 'THWN-2', 'THWN-2'], circuit.id );
-      circuit.volt_rating = 600;
-      circuit.wet_temp_rating = 90;
-      circuit.conduit_type = sf.index( ['NA', 'Metallic', 'Metallic'], circuit.id );
 
       
       
