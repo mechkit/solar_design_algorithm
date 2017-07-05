@@ -16,6 +16,7 @@ var SDA = function(system_settings){
   var source = system_settings.state.system.source;
   var system = system_settings.state.system.module;
   var inverter = system_settings.state.system.inverter;
+  var optimizer = system_settings.state.system.optimizer;
   var interconnection = system_settings.state.system.interconnection;
   var circuits = system_settings.state.system.circuits;
   var error_check = system_settings.state.system.error_check;
