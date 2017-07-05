@@ -75,7 +75,7 @@ nominal_ac_output_power = nominal_ac_output_power_240
 max_ac_output_current = max_ac_ouput_current_240
 
     inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
-    inverter.max_ac_output_current = inverter['max_ac_ouput_current_'+inverter.grid_voltage];
+    inverter.max_ac_output_current = inverter['max_ac_output_current_'+inverter.grid_voltage];
     
     
 ### Array checks
@@ -148,7 +148,7 @@ The total nominal module power output for each branch must not exceed the manufa
 
 The module(s) power and voltage must be within the inverter manufacturer's limits.
 
-    error_check.module_power_too_high = module.pmp > optimizer.optimizer.rated_max_power;
+    error_check.module_power_too_high = module.pmp > optimizer.rated_max_power;
     // If error check is true, flag system design failure, and report notice to user.
     if(error_check.module_power_too_high ){ report_error( 'Optimizer is undersized for module.' );}
 
