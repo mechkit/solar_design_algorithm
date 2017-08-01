@@ -62,11 +62,12 @@ The total nominal module power output for each branch must not exceed the manufa
 
 ### Module - Inverter checks
 
-The module(s) power must be within the inverter manufacturer's limits.
+The module's operating voltage must be within the inverter's MPPT operating range. 
+
+The module's operating voltage must be less than the inverter maximum operating current. 
 
 
-The module's operating voltage must be less than the inverter maximum operating voltage. 
-The selected module can not have more cells than allowed by the inveter manufacturer.
+The selected module can not have more cells than allowed by the inverter manufacturer.
 
 ### Conductor and conduit schedule
 

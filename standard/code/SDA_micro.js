@@ -1,6 +1,6 @@
 var settings_constants = require('./settings/settings_constants.js');
 var tables = require('./tables.js');
-var f = require('./functions/functions.js');
+var f = require('functions');
 var math = require('mathjs');
 var sf = require('spreadsheet_functions');
 
@@ -37,17 +37,16 @@ var SDA = function(system_settings){
   error_check.power_check_array = array.pmp > 10000;
   // If error check is true, flag system design failure, and report notice to user.
   if( error_check.power_check_array ){ report_error( 'Array total power exceeds 10kW' );}
-  error_check.module_power_too_high = module.pmp > inverter.max_panel_wattage;
+  error_check.module_voltage_min = module.vmp > inverter.mppt_min;
   // If error check is true, flag system design failure, and report notice to user.
-  if(error_check.module_power_too_high ){ report_error( 'Microinverter is undersized for module.' );}
-  error_check.module_power_too_low = module.pmp < inverter.min_panel_wattage;
+  if(error_check.module_voltage_min ){ report_error( 'Module voltage exceeds inverter maximum.' );}
+  error_check.module_voltage_max = module.vmp > inverter.mppt_max;
   // If error check is true, flag system design failure, and report notice to user.
-  if(error_check.module_power_too_low ){ report_error( 'Microinverter is oversized for module.' );}
+  if(error_check.module_voltage_max ){ report_error( 'Module voltage does not meet inverter minimum.' );}
   
-  error_check.module_voltage = module.vmp > inverter.vmax;
+  error_check.module_current = module.isc > inverter.isc_channel;
   // If error check is true, flag system design failure, and report notice to user.
-  if(error_check.module_voltage ){ report_error( 'Module voltage exceeds inverter maximum.' );}
-  
+  if(error_check.module_current ){ report_error( 'Module current exceeds inverter maximum.' );}
   error_check.module_cells = module.total_number_cells > inverter.max_module_cells  ;
   // If error check is true, flag system design failure, and report notice to user.
   if(error_check.module_cells ){ report_error( 'Module cell count exceeds the maximum allowed by the inverter.' );}

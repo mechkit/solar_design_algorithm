@@ -1,6 +1,6 @@
 var settings_constants = require('./settings/settings_constants.js');
 var tables = require('./tables.js');
-var f = require('./functions/functions.js');
+var f = require('functions');
 var math = require('mathjs');
 var sf = require('spreadsheet_functions');
 
