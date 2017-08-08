@@ -74,7 +74,7 @@ The total nominal module power output for each branch must not exceed the manufa
 
 The module's operating voltage must be within the inverter's MPPT operating range. 
 
-    error_check.module_voltage_min = module.vmp > inverter.mppt_min;
+    error_check.module_voltage_min = module.vmp < inverter.mppt_min;
     // If error check is true, flag system design failure, and report notice to user.
     if(error_check.module_voltage_min ){ report_error( 'Module voltage exceeds inverter maximum.' );}
     error_check.module_voltage_max = module.vmp > inverter.mppt_max;
