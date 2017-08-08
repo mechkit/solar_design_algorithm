@@ -76,10 +76,10 @@ The module's operating voltage must be within the inverter's MPPT operating rang
 
     error_check.module_voltage_min = module.vmp < inverter.mppt_min;
     // If error check is true, flag system design failure, and report notice to user.
-    if(error_check.module_voltage_min ){ report_error( 'Module voltage exceeds inverter maximum.' );}
+    if(error_check.module_voltage_min ){ report_error( 'Module voltage does not meet inverter minimum.' );}
     error_check.module_voltage_max = module.vmp > inverter.mppt_max;
     // If error check is true, flag system design failure, and report notice to user.
-    if(error_check.module_voltage_max ){ report_error( 'Module voltage does not meet inverter minimum.' );}
+    if(error_check.module_voltage_max ){ report_error( 'Module voltage exceeds inverter maximum.' );}
     
 The module's operating voltage must be less than the inverter maximum operating current. 
 
