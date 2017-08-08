@@ -10,19 +10,6 @@ The secondary documents are automatically created from this source:
 
 Note: For each section, the symbols are pre-pended by a section name to assist with their use in the computer code, in the form of "section.symbol".
 
-## String Inverter System Calculations
-
-From the Solar Edge "VOC and ISC in SolarEdge Systems" technical note:
-
-| MPPT maximum operating voltage (V)                                 | inverter.mppt_max  
-
-
-    source.vmp = module.pmp / source.max_power * inverter.dc_voltage_nominal;
-    source.imp = source.max_power / inverter.dc_voltage_nominal;
-    source.voc = 1 * array.largest_string;
-    source.isc = 0.6; //amps
-
-
 
 ### Modules, source circuits, and array
 
@@ -45,6 +32,7 @@ Calculation summary:
 | PV Output Circuit Maximum Current per MPPT (A)                            | array.combined_isc          | source.isc * array.circuits_per_MPPT                                                                 | A    |
 | Total PV Output Circuit Maximum Current (A)                               | array.total_isc             | optimizer.max_output_current * array.num_of_strings                                                  | A    |
 | Maximum module voltage                                                    | module.max_voltage          | module.voc * ( 1 + module.tc_voc_percent / 100 * ( array.min_temp - 25))                             | V    |
+| MPPT maximum operating voltage (V)                                        | inverter.mppt_max           |                                                                                                      |      |
     
 
     inverter.dc_voltage_nominal = inverter.mppt_max;
