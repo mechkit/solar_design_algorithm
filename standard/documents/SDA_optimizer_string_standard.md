@@ -10,15 +10,6 @@ The secondary documents are automatically created from this source:
 
 Note: For each section, the symbols are pre-pended by a section name to assist with their use in the computer code, in the form of "section.symbol".
 
-## String Inverter System Calculations
-
-From the Solar Edge "VOC and ISC in SolarEdge Systems" technical note:
-
-| MPPT maximum operating voltage (V)                                 | inverter.mppt_max  
-
-
-
-
 
 ### Modules, source circuits, and array
 
@@ -38,8 +29,10 @@ Calculation summary:
 | Minimum array voltage ( module temp. correction factor )                  | array.min_voltage           | array.smallest_string * module.vmp * ( 1 + module.tc_vpmax_percent / 100 * ( array.max_temp - 25 ) ) | V    |
 | Maximum Power (W)                                                         | array.pmp                   | array.num_of_modules * module.pmp                                                                    | W    |
 | Enter Maximum Number of Parallel Source Circuits per Output Circuit (1-2) | array.circuits_per_MPPT     | Math.ceil( array.num_of_strings / inverter.mppt_channels )                                           |      |
-| PV Output Circuit Maximum Current (A)                                     | array.combined_isc          | source.isc * array.circuits_per_MPPT                                                                 | A    |
+| PV Output Circuit Maximum Current per MPPT (A)                            | array.combined_isc          | source.isc * array.circuits_per_MPPT                                                                 | A    |
+| Total PV Output Circuit Maximum Current (A)                               | array.total_isc             | optimizer.max_output_current * array.num_of_strings                                                  | A    |
 | Maximum module voltage                                                    | module.max_voltage          | module.voc * ( 1 + module.tc_voc_percent / 100 * ( array.min_temp - 25))                             | V    |
+| MPPT maximum operating voltage (V)                                        | inverter.mppt_max           |                                                                                                      |      |
 
 
 ### Inverter
@@ -71,9 +64,7 @@ The minimum array voltage must be greater than the inverter minimum operating vo
 The total array power must be less than 10,000W.
 
 
-The combined DC short circuit current from the array must be less than the maximum allowed per inverter MPPT channel. 
-The combined current is the total current per MPP tracker input. 
-A correction factor of 1.25 is applied to the STC module Isc to account for high irradiance conditions.
+The DC array can be oversized relative to the inverter, but the total DC power can not exceed 135% of the inverters AC output power.
 
 ### Array source checks
 

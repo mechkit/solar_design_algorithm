@@ -28,10 +28,6 @@ var SDA = function(system_settings){
   ///////////////////////////////////////////
   /// calculations from standard document ///
   ///////////////////////////////////////////
-  source.vmp = module.pmp / source.max_power * inverter.dc_voltage_nominal;
-  source.imp = source.max_power / inverter.dc_voltage_nominal;
-  source.voc = 1 * array.largest_string;
-  source.isc = 0.6; //amps
   
   inverter.dc_voltage_nominal = inverter.mppt_max;
   source.vmp = module.pmp / source.max_power * inverter.dc_voltage_nominal;
@@ -46,6 +42,7 @@ var SDA = function(system_settings){
   array.pmp = array.num_of_modules * module.pmp;
   array.circuits_per_MPPT = Math.ceil( array.num_of_strings / inverter.mppt_channels );
   array.combined_isc = source.i_max * array.circuits_per_MPPT;
+  array.total_isc = optimizer.max_output_current * array.num_of_strings;
   module.max_voltage = module.voc * ( 1 + module.tc_voc_percent / 100 * ( array.min_temp - 25));
   inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
   inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
@@ -72,7 +69,7 @@ var SDA = function(system_settings){
   // If error check is true, flag system design failure, and report notice to user.
   if( error_check.power_check_array ){ report_error( 'Array total power exceeds 10kW' );}
   
-  error_check.current_check_inverter = ( array.combined_isc * 1.25 ) > inverter.isc_channel;
+  error_check.current_check_inverter = array.max_power > ( inverter.max_ac_output_current * interconnection.grid_voltage * 1.35 );
   // If error check is true, flag system design failure, and report notice to user.
   if( error_check.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' );}
   

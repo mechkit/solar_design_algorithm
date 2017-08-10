@@ -37,12 +37,12 @@ var SDA = function(system_settings){
   error_check.power_check_array = array.pmp > 10000;
   // If error check is true, flag system design failure, and report notice to user.
   if( error_check.power_check_array ){ report_error( 'Array total power exceeds 10kW' );}
-  error_check.module_voltage_min = module.vmp > inverter.mppt_min;
+  error_check.module_voltage_min = module.vmp < inverter.mppt_min;
   // If error check is true, flag system design failure, and report notice to user.
-  if(error_check.module_voltage_min ){ report_error( 'Module voltage exceeds inverter maximum.' );}
+  if(error_check.module_voltage_min ){ report_error( 'Module voltage does not meet inverter minimum.' );}
   error_check.module_voltage_max = module.vmp > inverter.mppt_max;
   // If error check is true, flag system design failure, and report notice to user.
-  if(error_check.module_voltage_max ){ report_error( 'Module voltage does not meet inverter minimum.' );}
+  if(error_check.module_voltage_max ){ report_error( 'Module voltage exceeds inverter maximum.' );}
   
   error_check.module_current = module.isc > inverter.isc_channel;
   // If error check is true, flag system design failure, and report notice to user.
