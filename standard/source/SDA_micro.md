@@ -29,7 +29,7 @@ Note: For each section, the symbols are pre-pended by a section name to assist w
 The nominal_ac_output_power is selected from fields based on the user selected grid voltage. As an example, if the user selects 240 VAC, then:
 
 nominal_ac_output_power = nominal_ac_output_power_240
-max_ac_output_current = max_ac_ouput_current_240
+max_ac_output_current = max_ac_output_current_240
 
     inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
     inverter.max_ac_output_current = inverter['max_ac_output_current_'+inverter.grid_voltage];
