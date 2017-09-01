@@ -74,7 +74,7 @@ var SDA = function(system_settings){
   if( error_check.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' );}
   inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
   inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
-  inverter.max_ac_output_current = inverter['max_ac_ouput_current_'+inverter.grid_voltage];
+  inverter.max_ac_output_current = inverter['max_ac_output_current_'+inverter.grid_voltage];
   
   var circuit_names = [
     'exposed source circuit wiring',
@@ -132,8 +132,8 @@ var SDA = function(system_settings){
     circuit.min_req_cond_current_2 = circuit.max_current / ( circuit.temp_correction_factor * circuit.conductors_adj_factor );
     circuit.min_req_cond_current_3 = circuit.max_current * 1.25 * 1.25;
     circuit.min_req_cond_current    = sf.max( circuit.min_req_cond_current_1, circuit.min_req_cond_current_2 );
-    circuit.min_req_OCPD_current_DC = sf.max( circuit.min_req_cond_current_2, circuit.min_req_cond_current_3  );
-    circuit.min_req_OCPD_current = sf.if( circuit.power_type === 'DC', circuit.min_req_OCPD_current_DC, circuit.min_req_cond_current_1);
+    
+    circuit.min_req_OCPD_current = sf.if( circuit.power_type === 'DC', circuit.min_req_cond_current_3, circuit.min_req_cond_current_1);
     circuit.OCPD_required = sf.index( [false, false, true ], circuit.id );
     circuit.ocpd_type = sf.index( ['NA', 'PV Fuse', 'Circuit Breaker'], circuit.id );
     
@@ -165,6 +165,8 @@ var SDA = function(system_settings){
     }
     // Use Table 5, lookup: circuit.conductor_size_min, return the first column.
     circuit.conductor_current = sf.lookup( circuit.conductor_size_min, tables[5], 1);
+    // Correct conductor_current for temperature and conduit fill.
+    circuit.conductor_current_cor = circuit.conductor_current * circuit.temp_correction_factor * circuit.conductors_adj_factor;
     // Use Table 6, lookup: circuit.conductor_size_min, return the first column.
     circuit.conductor_strands = sf.lookup( circuit.conductor_size_min, tables[6], 1 );
     // Use Table 6, lookup: circuit.conductor_size_min, return the second column.

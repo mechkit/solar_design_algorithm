@@ -111,6 +111,8 @@ var SDA = function(system_settings){
     }
     // Use Table 5, lookup: circuit.conductor_size_min, return the first column.
     circuit.conductor_current = sf.lookup( circuit.conductor_size_min, tables[5], 1);
+    // Correct conductor_current for temperature and conduit fill.
+    circuit.conductor_current_cor = circuit.conductor_current * circuit.temp_correction_factor * circuit.conductors_adj_factor;
     // Use Table 6, lookup: circuit.conductor_size_min, return the first column.
     circuit.conductor_strands = sf.lookup( circuit.conductor_size_min, tables[6], 1 );
     // Use Table 6, lookup: circuit.conductor_size_min, return the second column.

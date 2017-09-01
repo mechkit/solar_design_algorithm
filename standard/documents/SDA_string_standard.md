@@ -74,7 +74,7 @@ AC_OCPD_max = max_ac_output_current * 1.25
 The nominal_ac_output_power is selected from fields based on the user selected grid voltage. As an example, if the user selects 240 VAC, then:
 
 nominal_ac_output_power = nominal_ac_output_power_240
-max_ac_output_current = max_ac_ouput_current_240
+max_ac_output_current = max_ac_output_current_240
 
 
 
@@ -118,7 +118,9 @@ There are three options to calculate the minimum required current:
 
 
 
-For AC circuits, the maximum of 1 and 2 is used. For DC circuits, the maximum of 2 and 3 is used.
+For AC circuits, the maximum of #1 and #2 is used. For DC circuits, the maximum of #2 and #3 is used.
+
+For OCPD calculations, DC uses #3, and SC uses #1.
 
 
 For strings per MPP tracker of 2 or less, or for inverters with built in OCPD, additional DC OCPD is not required. The AC circuits do require OCPD at the panel.

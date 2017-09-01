@@ -45,7 +45,7 @@ AC_OCPD_max = max_ac_output_current * 1.25
 The nominal_ac_output_power is selected from fields based on the user selected grid voltage. As an example, if the user selects 240 VAC, then:
 
 nominal_ac_output_power = nominal_ac_output_power_240
-max_ac_output_current = max_ac_ouput_current_240
+max_ac_output_current = max_ac_output_current_240
 
 ### Array checks
 
