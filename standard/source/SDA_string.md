@@ -222,11 +222,13 @@ There are three options to calculate the minimum required current:
       circuit.min_req_cond_current_2 = circuit.max_current / ( circuit.temp_correction_factor * circuit.conductors_adj_factor );
       circuit.min_req_cond_current_3 = circuit.max_current * 1.25 * 1.25;
 
-For AC circuits, the maximum of 1 and 2 is used. For DC circuits, the maximum of 2 and 3 is used.
+For AC circuits, the maximum of #1 and #2 is used. For DC circuits, the maximum of #2 and #3 is used.
 
       circuit.min_req_cond_current    = sf.max( circuit.min_req_cond_current_1, circuit.min_req_cond_current_2 );
-      circuit.min_req_OCPD_current_DC = sf.max( circuit.min_req_cond_current_2, circuit.min_req_cond_current_3  );
-      circuit.min_req_OCPD_current = sf.if( circuit.power_type === 'DC', circuit.min_req_OCPD_current_DC, circuit.min_req_cond_current_1);
+      
+For OCPD calculations, DC uses #3, and SC uses #1.
+
+      circuit.min_req_OCPD_current = sf.if( circuit.power_type === 'DC', circuit.min_req_cond_current_3, circuit.min_req_cond_current_1);
 
 For strings per MPP tracker of 2 or less, or for inverters with built in OCPD, additional DC OCPD is not required. The AC circuits do require OCPD at the panel.
 
