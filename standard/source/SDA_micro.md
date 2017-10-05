@@ -248,8 +248,8 @@ At least one of the following checks must not fail:
 * The sum of the ampere ratings of all overcurrent devices on panelboards exceeded the ampacity of the busbar.                                                                       
 
 
-    interconnection.inverter_output_cur_sum = inverter.max_ac_output_current * array.num_of_strings;
-    interconnection.inverter_ocpd_dev_sum = inverter.OCPD;
+    interconnection.inverter_output_cur_sum = source.current * array.num_of_strings;
+    interconnection.inverter_ocpd_dev_sum = inverter.OCPD * array.num_of_strings;
 
     interconnection.check_1 = ( ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating;
     interconnection.check_2 = ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2;
