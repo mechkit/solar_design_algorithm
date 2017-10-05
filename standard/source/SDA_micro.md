@@ -12,17 +12,7 @@ Note: For each section, the symbols are pre-pended by a section name to assist w
 
 ## Micro Inverter System Calculations
 
-### Calculations
 
-| Description                   | Symbol           | Calculation                                                 | Unit |
-|:------------------------------|:-----------------|:------------------------------------------------------------|:-----|
-| Maximum source/branch power   | source.max_power | module.pmp * array.largest_string                           | W    |
-| Maximum source/branch current | source.current   | inverter.max_ac_output_current / 240 * array.largest_string | A    |
-| Maximum array power           | array.pmp        | array.num_of_modules * module.pmp                           | W    |
-
-    source.max_power = module.pmp * array.largest_string;
-    source.current = inverter.max_ac_output_current * array.largest_string;
-    array.pmp = array.num_of_modules * module.pmp;
 
 ### Inverter
 
@@ -40,7 +30,17 @@ AC_OCPD_max = max_ac_output_current * 1.25
 
     inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
 
-    
+### Array
+
+| Description                   | Symbol           | Calculation                                                   | Unit |
+|:------------------------------|:-----------------|:--------------------------------------------------------------|:-----|
+| Maximum source/branch power   | source.max_power | module.pmp * array.largest_string                             | W    |
+| Maximum source/branch current | source.current   | inverter.nominal_ac_output_power / 240 * array.largest_string | A    |
+| Maximum array power           | array.pmp        | array.num_of_modules * module.pmp                             | W    |
+
+    source.max_power = module.pmp * array.largest_string;
+    source.current = inverter.nominal_ac_output_power / 240 * array.largest_string;
+    array.pmp = array.num_of_modules * module.pmp;    
 
 
 ### Array checks
