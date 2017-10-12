@@ -18,16 +18,20 @@ Calculation summary:
 | Description                                                               | Symbol                      | Calculation                                                                                          | Unit |
 |:--------------------------------------------------------------------------|:----------------------------|:-----------------------------------------------------------------------------------------------------|:-----|
 | Maximum Power (W)                                                         | inverter.dc_voltage_nominal | inverter.mppt_max                                                                                    | v    |
+| Maximum Power (W)                                                         | source.max_power            | module.pmp * array.largest_string                                                                    |      |
 | Maximum Power Voltage (V)                                                 | source.vmp                  | module.pmp / source.max_power * inverter.dc_voltage_nominal                                          |      |
 | Maximum Power Current (A)                                                 | source.imp                  | source.max_power / inverter.dc_voltage_nominal                                                       |      |
 | Open-Circuit Voltage (V)                                                  | source.voc                  | 1 * array.largest_string                                                                             |      |
 | Short-Circuit Current (A)                                                 | source.isc                  | 0.6                                                                                                  |      |
 | Maximum Circuit Current (A)                                               | source.i_max                | optimizer.max_output_current                                                                         |      |
-| Maximum Power (W)                                                         | source.max_power            | module.pmp * array.largest_string                                                                    |      |
 | Source Circuit Maximum Current (A), Isc x 1.25                            | source.Isc_adjusted         | module.isc * 1.25                                                                                    | A    |
 | Maximum system voltage                                                    | array.max_sys_voltage       | inverter.dc_voltage_nominal                                                                          |      |
 | Minimum array voltage ( module temp. correction factor )                  | array.min_voltage           | array.smallest_string * module.vmp * ( 1 + module.tc_vpmax_percent / 100 * ( array.max_temp - 25 ) ) | V    |
 | Maximum Power (W)                                                         | array.pmp                   | array.num_of_modules * module.pmp                                                                    | W    |
+| Maximum Power Voltage (V)                                                 | array.voc                   | source.voc                                                                                           | V    |
+| Maximum Power Current (A)                                                 | array.isc                   | source.isc                                                                                           | A    |
+| Open-Circuit Voltage (V)                                                  | array.vmp                   | source.vmp                                                                                           | V    |
+| Short-Circuit Current (A)                                                 | array.imp                   | source.imp                                                                                           | A    |
 | Enter Maximum Number of Parallel Source Circuits per Output Circuit (1-2) | array.circuits_per_MPPT     | Math.ceil( array.num_of_strings / inverter.mppt_channels )                                           |      |
 | PV Output Circuit Maximum Current per MPPT (A)                            | array.combined_isc          | source.isc * array.circuits_per_MPPT                                                                 | A    |
 | Total PV Output Circuit Maximum Current (A)                               | array.total_isc             | optimizer.max_output_current * array.num_of_strings                                                  | A    |
@@ -36,16 +40,20 @@ Calculation summary:
     
 
     inverter.dc_voltage_nominal = inverter.mppt_max;
+    source.max_power = module.pmp * array.largest_string;
     source.vmp = module.pmp / source.max_power * inverter.dc_voltage_nominal;
     source.imp = source.max_power / inverter.dc_voltage_nominal;
     source.voc = 1 * array.largest_string;
     source.isc = 0.6; //amps
     source.i_max = optimizer.max_output_current;
-    source.max_power = module.pmp * array.largest_string;
     source.Isc_adjusted = module.isc * 1.25;
     array.max_sys_voltage = inverter.dc_voltage_nominal;
     array.min_voltage = inverter.dc_voltage_nominal;
     array.pmp = array.num_of_modules * module.pmp;
+    array.voc = source.voc;
+    array.isc = source.isc;
+    array.vmp = source.vmp;
+    array.imp = source.imp;
     array.circuits_per_MPPT = Math.ceil( array.num_of_strings / inverter.mppt_channels );
     array.combined_isc = source.i_max * array.circuits_per_MPPT;
     array.total_isc = optimizer.max_output_current * array.num_of_strings;
@@ -381,7 +389,8 @@ At least one of the following checks must not fail:
 
     interconnection.inverter_output_cur_sum = interconnection.inverter_output_cur_sum || inverter.max_ac_output_current;
     interconnection.inverter_ocpd_dev_sum = interconnection.inverter_ocpd_dev_sum || inverter.OCPD;
-
+    interconnection.max_ac_current = inverter.max_ac_output_current;
+    
     interconnection.check_1 = ( ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating;
     interconnection.check_2 = ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2;
     interconnection.check_3 = ( interconnection.inverter_ocpd_dev_sum + interconnection.load_breaker_total ) > interconnection.bussbar_rating;

@@ -250,6 +250,7 @@ At least one of the following checks must not fail:
 
     interconnection.inverter_output_cur_sum = source.current * array.num_of_strings;
     interconnection.inverter_ocpd_dev_sum = inverter.OCPD * array.num_of_strings;
+    interconnection.max_ac_current = source.current;
 
     interconnection.check_1 = ( ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating;
     interconnection.check_2 = ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2;
