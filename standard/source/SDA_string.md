@@ -57,6 +57,7 @@ Calculation summary:
     array.isc = module.isc * array.num_of_strings;
     array.vmp = module.vmp * array.largest_string;
     array.imp = module.imp * array.num_of_strings;
+    array.max_sys_current = array.isc;
     array.isc_adjusted = array.isc * 1.25;
     array.vmp_adjusted = array.max_sys_voltage_2;
     array.circuits_per_MPPT = Math.ceil( array.num_of_strings / inverter.mppt_channels );
