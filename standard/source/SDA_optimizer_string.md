@@ -49,7 +49,8 @@ Calculation summary:
 | Maximum Power Voltage (V)                                                 | array.voc                   | source.voc                                                                                           | V    |
 | Maximum Power Current (A)                                                 | array.isc                   | source.isc                                                                                           | A    |
 | Open-Circuit Voltage (V)                                                  | array.vmp                   | string_nominal_voltage[inverter.grid_voltage]                                                        | V    |
-| Short-Circuit Current (A)                                                 | array.imp                   | source.imp                                                                                           | A    |
+| Short-Circuit Current (A)                                                 | array.imp                   | array.pmp / array.vmp                                                                                | A    |
+| Short-Circuit Current (A)                                                 | array.imp                   | array.imp > inverter.imax_channel ? inverter.imax_channel : array.imp                                | A    |
 | Enter Maximum Number of Parallel Source Circuits per Output Circuit (1-2) | array.circuits_per_MPPT     | Math.ceil( array.num_of_strings / inverter.mppt_channels )                                           |      |
 | PV Output Circuit Maximum Current per MPPT (A)                            | array.combined_isc          | source.isc * array.circuits_per_MPPT                                                                 | A    |
 | Total PV Output Circuit Maximum Current (A)                               | array.total_isc             | optimizer.max_output_current * array.num_of_strings                                                  | A    |
@@ -71,7 +72,8 @@ Calculation summary:
     array.voc = source.voc;
     array.isc = source.isc;
     array.vmp = string_nominal_voltage[inverter.grid_voltage] 
-    array.imp = source.imp;
+    array.imp = array.pmp / array.vmp;
+    array.imp = array.imp > inverter.imax_channel ? inverter.imax_channel : array.imp;
     array.circuits_per_MPPT = Math.ceil( array.num_of_strings / inverter.mppt_channels );
     array.combined_isc = source.i_max * array.circuits_per_MPPT;
     array.total_isc = optimizer.max_output_current * array.num_of_strings;
