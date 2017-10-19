@@ -135,7 +135,7 @@ The total array power must be less than 10,000W.
 
 The DC array can be oversized relative to the inverter, but the total DC power can not exceed 135% of the inverters AC output power.
 
-    error_check.current_check_inverter = array.max_power > ( inverter.max_ac_output_current * interconnection.grid_voltage * 1.35 );
+    error_check.current_check_inverter = array.pmp > ( inverter.max_ac_output_current * interconnection.grid_voltage * 1.35 );
     // If error check is true, flag system design failure, and report notice to user.
     if( error_check.current_check_inverter ){ report_error( 'PV output circuit maximum current exceeds the inverter maximum dc current per MPPT input.' );}
     
