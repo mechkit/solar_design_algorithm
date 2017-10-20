@@ -55,19 +55,19 @@ The total array power must be less than 10,000W.
 
 The largest number of microinverters per branch must not exceed the maximum number allowed by the manufacturer.
 
-  error_check.micro_branch_too_many_modules = array.largest_string > inverter.max_unitsperbranch;
-  // If error check is true, flag system design failure, and report notice to user.
-  if(error_check.micro_branch_too_many_modules ){ report_error( 'The system has too many inverters per branch circuit.' );}
-  
-  error_check.micro_branch_too_few_modules = array.smallest_string < inverter.min_unitsperbranch;
-  // If error check is true, flag system design failure, and report notice to user.
-  if(error_check.micro_branch_too_few_modules ){ report_error( 'The system has too many inverters per branch circuit.' );}
+    error_check.micro_branch_too_many_modules = array.largest_string > inverter.max_unitsperbranch;
+    // If error check is true, flag system design failure, and report notice to user.
+    if(error_check.micro_branch_too_many_modules ){ report_error( 'The system has too many inverters per branch circuit.' );}
+    
+    error_check.micro_branch_too_few_modules = array.smallest_string < inverter.min_unitsperbranch;
+    // If error check is true, flag system design failure, and report notice to user.
+    if(error_check.micro_branch_too_few_modules ){ report_error( 'The system has too many inverters per branch circuit.' );}
 
 The total nominal module power output for each branch must not exceed the manufacturer's limit. 
 
-  error_check.micro_branch_too_much_power = source.max_power > inverter.max_watts_per_branch;
-  // If error check is true, flag system design failure, and report notice to user.
-  if(error_check.micro_branch_too_much_power ){ report_error( 'The branch circuit power limit has exceeded the manufacturer's limit.' );}
+    error_check.micro_branch_too_much_power = source.max_power > inverter.max_watts_per_branch;
+    // If error check is true, flag system design failure, and report notice to user.
+    if(error_check.micro_branch_too_much_power ){ report_error( 'The branch circuit power limit has exceeded the manufacturer's limit.' );}
 
 
 ### Module - Inverter checks
