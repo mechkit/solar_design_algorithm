@@ -42,6 +42,7 @@ var SDA = function(system_settings){
   array.isc = module.isc * array.num_of_strings;
   array.vmp = module.vmp * array.largest_string;
   array.imp = module.imp * array.num_of_strings;
+  array.max_sys_current = array.isc;
   array.isc_adjusted = array.isc * 1.25;
   array.vmp_adjusted = array.max_sys_voltage_2;
   array.circuits_per_MPPT = Math.ceil( array.num_of_strings / inverter.mppt_channels );
@@ -200,6 +201,8 @@ var SDA = function(system_settings){
   });
   interconnection.inverter_output_cur_sum = interconnection.inverter_output_cur_sum || inverter.max_ac_output_current;
   interconnection.inverter_ocpd_dev_sum = interconnection.inverter_ocpd_dev_sum || inverter.OCPD;
+  interconnection.max_ac_current = inverter.max_ac_output_current;
+  interconnection.max_ac_current_125 = interconnection.max_ac_current * 1.25;
   interconnection.check_1 = ( ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating;
   interconnection.check_2 = ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2;
   interconnection.check_3 = ( interconnection.inverter_ocpd_dev_sum + interconnection.load_breaker_total ) > interconnection.bussbar_rating;

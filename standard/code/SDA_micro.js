@@ -27,16 +27,25 @@ var SDA = function(system_settings){
   ///////////////////////////////////////////
   /// calculations from standard document ///
   ///////////////////////////////////////////
-  source.max_power = module.pmp * array.largest_string;
-  source.current = inverter.max_ac_output_current * array.largest_string;
-  array.pmp = array.num_of_modules * module.pmp;
   inverter.nominal_ac_output_power = inverter['nominal_ac_output_power_'+inverter.grid_voltage];
   inverter.max_ac_output_current = inverter['max_ac_output_current_'+inverter.grid_voltage];
   inverter.AC_OCPD_max = sf.if( sf.not( inverter.max_ac_ocpd ), inverter.max_ac_output_current * 1.25, inverter.max_ac_ocpd );
-  
+  source.max_power = module.pmp * array.largest_string;
+  source.current = inverter.nominal_ac_output_power / 240 * array.largest_string;
+  array.pmp = array.num_of_modules * module.pmp;    
   error_check.power_check_array = array.pmp > 10000;
   // If error check is true, flag system design failure, and report notice to user.
   if( error_check.power_check_array ){ report_error( 'Array total power exceeds 10kW' );}
+  error_check.micro_branch_too_many_modules = array.largest_string > inverter.max_unitsperbranch;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.micro_branch_too_many_modules ){ report_error( 'The system has too many inverters per branch circuit.' );}
+  
+  error_check.micro_branch_too_few_modules = array.smallest_string < inverter.min_unitsperbranch;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.micro_branch_too_few_modules ){ report_error( 'The system has too many inverters per branch circuit.' );}
+  error_check.micro_branch_too_much_power = source.max_power > inverter.max_watts_per_branch;
+  // If error check is true, flag system design failure, and report notice to user.
+  if(error_check.micro_branch_too_much_power ){ report_error( 'The branch circuit power limit has exceeded the manufacturer's limit.' );}
   error_check.module_voltage_min = module.vmp < inverter.mppt_min;
   // If error check is true, flag system design failure, and report notice to user.
   if(error_check.module_voltage_min ){ report_error( 'Module voltage does not meet inverter minimum.' );}
@@ -144,8 +153,10 @@ var SDA = function(system_settings){
     //////
     
   });
-  interconnection.inverter_output_cur_sum = inverter.max_ac_output_current * array.num_of_strings;
-  interconnection.inverter_ocpd_dev_sum = inverter.OCPD;
+  interconnection.inverter_output_cur_sum = source.current * array.num_of_strings;
+  interconnection.inverter_ocpd_dev_sum = inverter.OCPD * array.num_of_strings;
+  interconnection.max_ac_current = source.current;
+  interconnection.max_ac_current_125 = interconnection.max_ac_current * 1.25;
   interconnection.check_1 = ( ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating ) > interconnection.bussbar_rating;
   interconnection.check_2 = ( interconnection.inverter_output_cur_sum * 1.25 ) + interconnection.supply_ocpd_rating > interconnection.bussbar_rating * 1.2;
   interconnection.check_3 = ( interconnection.inverter_ocpd_dev_sum + interconnection.load_breaker_total ) > interconnection.bussbar_rating;
