@@ -67,7 +67,7 @@ The total nominal module power output for each branch must not exceed the manufa
 
     error_check.micro_branch_too_much_power = source.max_power > inverter.max_watts_per_branch;
     // If error check is true, flag system design failure, and report notice to user.
-    if(error_check.micro_branch_too_much_power ){ report_error( 'The branch circuit power limit has exceeded the manufacturer's limit.' );}
+    if(error_check.micro_branch_too_much_power ){ report_error( 'The branch circuit power limit has exceeded the manufacturer\'s limit.' );}
 
 
 ### Module - Inverter checks
