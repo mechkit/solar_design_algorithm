@@ -45,7 +45,7 @@ var SDA = function(system_settings){
   if(error_check.micro_branch_too_few_modules ){ report_error( 'The system has too many inverters per branch circuit.' );}
   error_check.micro_branch_too_much_power = source.max_power > inverter.max_watts_per_branch;
   // If error check is true, flag system design failure, and report notice to user.
-  if(error_check.micro_branch_too_much_power ){ report_error( 'The branch circuit power limit has exceeded the manufacturer's limit.' );}
+  if(error_check.micro_branch_too_much_power ){ report_error( 'The branch circuit power limit has exceeded the manufacturer\'s limit.' );}
   error_check.module_voltage_min = module.vmp < inverter.mppt_min;
   // If error check is true, flag system design failure, and report notice to user.
   if(error_check.module_voltage_min ){ report_error( 'Module voltage does not meet inverter minimum.' );}
