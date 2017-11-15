@@ -391,7 +391,7 @@ The NEC article 352 and 358 tables are used to find a conduit with a sufficent 4
         circuit.ocpd_type = '-';
         circuit.OCPD = '-';
       }
-      circuit.conductor_size_min = circuit.conductor_size_min + ', ' + circuit.conductor_size_min;
+      circuit.conductor_size_min = circuit.conductor_size_min + ', ' + circuit.conductor_size_min + ', ' + circuit.conductor_size_min;
       //////
       
     });

@@ -232,7 +232,7 @@ PV Microinverter AC sources:
         circuit.ocpd_type = '-';
         circuit.OCPD = '-';
       }
-      circuit.conductor_size_min = circuit.conductor_size_min;
+      circuit.conductor_size_min = circuit.conductor_size_min + ', ' + circuit.conductor_size_min + ', ' + circuit.conductor_size_min;
       //////
       
     });
