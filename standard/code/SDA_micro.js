@@ -149,7 +149,7 @@ var SDA = function(system_settings){
       circuit.ocpd_type = '-';
       circuit.OCPD = '-';
     }
-    circuit.conductor_size_min = circuit.conductor_size_min;
+    circuit.conductor_size_min = circuit.conductor_size_min + ', ' + circuit.conductor_size_min + ', ' + circuit.conductor_size_min;
     //////
     
   });
